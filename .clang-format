@@ -1,0 +1,16 @@
+---
+BasedOnStyle: LLVM
+ColumnLimit: 120
+ReferenceAlignment: Left
+PointerAlignment: Left
+BinPackArguments: false
+BinPackParameters: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
+AllowShortEnumsOnASingleLine: false
+AllowShortCaseExpressionOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortCompoundRequirementOnASingleLine: false
