@@ -18,6 +18,12 @@ set(SCAM_SRC
         src/Gameloop.h
         src/Gameloop.cpp
         src/Prelude.h
+        src/FrameCounter.cpp
+        src/FrameCounter.h
+        src/Dashboard.cpp
+        src/Dashboard.h
+        src/Coin.cpp
+        src/Coin.h
 )
 
 add_executable(Scam WIN32 ${SCAM_SRC})

@@ -6,4 +6,4 @@ namespace Scam {
 
 void main_loop(SDL_Window* window);
 
-}
+} // namespace Scam
