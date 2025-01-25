@@ -112,11 +112,11 @@ void Dashboard::Update(const Coin& coin) {
     ImGui::Begin("Market");
     if (ImPlot::BeginPlot("Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
       float x_min = std::max(x_data.back() - 365.f, 0.f);
-      float x_max = std::max(365.f, x_data.back());
-      ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_AutoFit);
+      float x_max = x_data.back();
+      ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
       ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
       ImPlot::SetNextLineStyle(ImVec4(.6f, .4f, .1f, 1.f), 2.f);
-      ImPlot::PlotLine("Stonks", x_data.data(), y_data.data(), (int)x_data.size());
+      ImPlot::PlotLine("BUBL", x_data.data(), y_data.data(), (int)x_data.size());
       ImPlot::EndPlot();
     }
     ImGui::End();
