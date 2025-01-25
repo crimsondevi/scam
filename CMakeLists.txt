@@ -91,7 +91,13 @@ target_link_libraries(Scam
         SDL3_mixer::SDL3_mixer
 )
 
-file(COPY data DESTINATION .)
+add_custom_target(data_files ALL
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data
+        COMMENT "Copying data files to output folder"
+)
+
+add_dependencies(Scam data_files)
 
 if (MSVC)
     set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Scam)
