@@ -40,6 +40,8 @@ void main_loop(SDL_Window* window) {
       }
     }
 
+    coin.Simulate(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier());
+
     // Begin frame
     {
       ImGui_ImplOpenGL3_NewFrame();
@@ -70,8 +72,6 @@ void main_loop(SDL_Window* window) {
       ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
       SDL_GL_SwapWindow(window);
     }
-
-    coin.Simulate(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier());
 
     std::this_thread::yield();
   }

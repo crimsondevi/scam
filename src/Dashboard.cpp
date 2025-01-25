@@ -26,11 +26,6 @@ Dashboard::Dashboard() {
   font_cfg.SizePixels = 52.f;
   big_font = io.Fonts->AddFontDefault(&font_cfg);
 
-  for (int i = 0; i < 365; i++) {
-    x_data.emplace_back(i);
-    y_data.emplace_back(0);
-  }
-
   window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
 
   sound_system = std::make_unique<SoundSystem>();
@@ -100,12 +95,14 @@ void Dashboard::Update(const Coin& coin) {
   // Update graph
 
   if (coin.days == 0) {
-    std::fill(y_data.begin(), y_data.end(), coin.stonks);
+    x_data.emplace_back(updated_days);
+    y_data.emplace_back(coin.stonks);
   }
 
   if (coin.days > updated_days) {
     updated_days++;
-    y_data.erase(y_data.begin());
+
+    x_data.emplace_back(updated_days);
     y_data.emplace_back(coin.stonks);
   }
 
@@ -113,13 +110,12 @@ void Dashboard::Update(const Coin& coin) {
   {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Market");
-    if (ImPlot::BeginPlot("Market", ImVec2(-1, -1))) {
-      ImPlot::SetupAxes(nullptr, nullptr, 0, 0);
-      ImPlot::SetupAxisLimits(ImAxis_X1, 0.f, 365.f, ImGuiCond_Always);
-      ImPlot::SetupAxisLimits(ImAxis_Y1,
-                              *std::min_element(y_data.begin(), y_data.end()),
-                              *std::max_element(y_data.begin(), y_data.end()),
-                              ImPlotCond_Always);
+    if (ImPlot::BeginPlot("Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
+      float x_min = std::max(x_data.back() - 365.f, 0.f);
+      float x_max = std::max(365.f, x_data.back());
+      ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_AutoFit);
+      ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
+      ImPlot::SetNextLineStyle(ImVec4(.6f, .4f, .1f, 1.f), 2.f);
       ImPlot::PlotLine("Stonks", x_data.data(), y_data.data(), (int)x_data.size());
       ImPlot::EndPlot();
     }
@@ -131,9 +127,9 @@ void Dashboard::Update(const Coin& coin) {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Action");
 
-    ImGui::BeginGroup();
     ImGui::Text("Day: %u", coin.days);
-    ImGui::SameLine();
+
+    ImGui::BeginGroup();
     ImGui::RadioButton("Pause", &speed_multiplier, 0);
     ImGui::SameLine();
     ImGui::RadioButton("1x", &speed_multiplier, 1);
