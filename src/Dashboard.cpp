@@ -1,11 +1,22 @@
 ﻿#include "Dashboard.h"
 
+#include "Prelude.h"
 #include "SoundSystem.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <implot.h>
 #include <vector>
+
+namespace ImGui {
+
+void TextCenter(std::string_view view) {
+  float font_size = ImGui::GetFontSize() * static_cast<float>(view.size()) / 2.f;
+  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2 - font_size + (font_size / 2));
+  ImGui::Text("%s", view.data());
+}
+
+} // namespace ImGui
 
 namespace Scam {
 
@@ -25,6 +36,8 @@ Dashboard::Dashboard() {
   sound_system = std::make_unique<SoundSystem>();
 
   sound_system->PlayMusic();
+
+  test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "bitcoin.png");
 }
 
 void Dashboard::Update(const Coin& coin) {
@@ -40,7 +53,7 @@ void Dashboard::Update(const Coin& coin) {
     ImGuiID dock_id_up, dock_id_bottom;
     ImGuiID dock_id_up_left, dock_id_up_right;
     ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, .75f, &dock_id_up, &dock_id_bottom);
-    ImGui::DockBuilderSplitNode(dock_id_up, ImGuiDir_Left, .25f, &dock_id_up_left, &dock_id_up_right);
+    ImGui::DockBuilderSplitNode(dock_id_up, ImGuiDir_Left, .2f, &dock_id_up_left, &dock_id_up_right);
 
     ImGui::DockBuilderDockWindow("Status", dock_id_up_left);
     ImGui::DockBuilderDockWindow("Market", dock_id_up_right);
@@ -56,16 +69,21 @@ void Dashboard::Update(const Coin& coin) {
     ImGui::Begin("Status");
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
-    ImGui::SeparatorText("Currency");
+    if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
+      auto size = ImGui::GetContentRegionAvail();
+      auto final_size = ConstrainToAspectRatio(size, texture_data.w / texture_data.h);
+      ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, final_size);
+    }
     ImGui::PushFont(big_font);
-    ImGui::Text("%s", coin.name.c_str());
+    ImGui::TextCenter(coin.name);
+    ImGui::TextCenter(coin.code);
     ImGui::PopFont();
 
     ImGui::SeparatorText("Market Value");
     ImGui::PushFont(big_font);
-    ImGui::Text("$%.2f", coin.stonks);
+    ImGui::TextCenter(std::format("${:.2f}", coin.stonks));
     ImGui::PopFont();
-    ImGui::Text("Trend: %+f", coin.stonks_delta);
+    ImGui::TextCenter(std::format("Trend: {:+.4f}", coin.stonks_delta));
 
     ImGui::SeparatorText("Hype");
     float hype = coin.hype;

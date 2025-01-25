@@ -2,6 +2,7 @@
 
 #include "Coin.h"
 #include "SoundSystem.h"
+#include "Texture.h"
 
 #include <imgui.h>
 
@@ -24,6 +25,8 @@ private:
 
 private:
   std::unique_ptr<SoundSystem> sound_system;
+
+  Texture test_texture;
 };
 
 } // namespace Scam

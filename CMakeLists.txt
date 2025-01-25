@@ -26,6 +26,8 @@ set(SCAM_SRC
         src/Coin.h
         src/SoundSystem.cpp
         src/SoundSystem.h
+        src/Texture.cpp
+        src/Texture.h
 )
 
 add_executable(Scam WIN32 ${SCAM_SRC})
@@ -80,6 +82,10 @@ add_library(implot STATIC
 target_link_libraries(implot imgui)
 target_include_directories(implot PUBLIC thirdparty/implot)
 
+# STB
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE thirdparty/stb)
+
 target_link_libraries(Scam
         PRIVATE
         ${OPENGL_LIBRARIES}
@@ -89,6 +95,7 @@ target_link_libraries(Scam
         implot
         SDL3::SDL3
         SDL3_mixer::SDL3_mixer
+        stb
 )
 
 add_custom_target(data_files ALL

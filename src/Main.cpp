@@ -3,6 +3,7 @@
 #include "Gameloop.h"
 
 #include <SDL3/SDL.h>
+#include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
@@ -24,7 +25,7 @@ int main(int argc, char* argv[]) {
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-  window = SDL_CreateWindow("Scam", 1920, 1080, SDL_WINDOW_OPENGL);
+  window = SDL_CreateWindow("Scam", 1920, 1080, SDL_WINDOW_OPENGL | SDL_EVENT_WINDOW_RESIZED);
 
   if (!window) {
     LOG_ERROR("Could not create scamming window: {}", SDL_GetError());
@@ -39,6 +40,12 @@ int main(int argc, char* argv[]) {
   }
 
   SDL_GL_MakeCurrent(window, gl_context);
+
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
+    LOG_ERROR("Failed to initialize GLAD");
+    return -1;
+  }
+
   SDL_GL_SetSwapInterval(1); // Enable vsync
   SDL_ShowWindow(window);
 

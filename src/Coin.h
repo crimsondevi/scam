@@ -14,6 +14,7 @@ public:
 
 public:
   std::string name;
+  std::string code;
   float stonks = 100.f;
   float stonks_delta = 0.f;
   float hype = 0.f;

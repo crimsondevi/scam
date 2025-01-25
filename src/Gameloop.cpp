@@ -3,15 +3,12 @@
 #include "Coin.h"
 #include "Dashboard.h"
 #include "FrameCounter.h"
-#include "Prelude.h"
 
-#include <SDL3/SDL_opengl.h>
-#include <deque>
+#include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_internal.h>
-#include <random>
 #include <thread>
 
 namespace Scam {
@@ -20,7 +17,8 @@ void main_loop(SDL_Window* window) {
   bool quit = false;
 
   Coin coin;
-  coin.name = "Bubble$Coin";
+  coin.name = "Bubble";
+  coin.code = "BUBL";
 
   FrameCounter frame_counter;
   Dashboard dashboard;
