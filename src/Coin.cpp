@@ -24,8 +24,8 @@ void Coin::Simulate(float delta_time) {
     hype = dist(rng);
   }
 
-  if (simulation_timer > .01f) {
-    simulation_timer -= .01;
+  if (simulation_timer > .1f) {
+    simulation_timer -= .1f;
 
     volatility = std::abs(std::sin(total_timer * .5f)) * 10.f;
 
@@ -34,6 +34,8 @@ void Coin::Simulate(float delta_time) {
       stonks_delta = dist(rng);
       stonks += stonks_delta;
     }
+
+    days++;
   }
 }
 

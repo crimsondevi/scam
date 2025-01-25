@@ -19,6 +19,7 @@ public:
   float stonks_delta = 0.f;
   float hype = 0.f;
   float volatility = 0.f;
+  uint32_t days = 0;
 
 private:
   float total_timer = 0.f;
@@ -28,5 +29,4 @@ private:
   std::mt19937 rng;
 };
 
-
-} // Scam
+} // namespace Scam

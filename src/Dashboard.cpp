@@ -99,8 +99,15 @@ void Dashboard::Update(const Coin& coin) {
 
   // Update graph
 
-  y_data.erase(y_data.begin());
-  y_data.emplace_back(coin.stonks);
+  if (coin.days == 0) {
+    std::fill(y_data.begin(), y_data.end(), coin.stonks);
+  }
+
+  if (coin.days > updated_days) {
+    updated_days++;
+    y_data.erase(y_data.begin());
+    y_data.emplace_back(coin.stonks);
+  }
 
   // Market window
   {
@@ -118,10 +125,23 @@ void Dashboard::Update(const Coin& coin) {
     }
     ImGui::End();
   }
+
   // Action window
   {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Action");
+
+    ImGui::BeginGroup();
+    ImGui::Text("Day: %u", coin.days);
+    ImGui::SameLine();
+    ImGui::RadioButton("Pause", &speed_multiplier, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("1x", &speed_multiplier, 1);
+    ImGui::SameLine();
+    ImGui::RadioButton("4x", &speed_multiplier, 4);
+    ImGui::SameLine();
+    ImGui::RadioButton("16x", &speed_multiplier, 16);
+    ImGui::EndGroup();
 
     static ImVec2 button_group_size;
 
@@ -154,6 +174,10 @@ void Dashboard::Update(const Coin& coin) {
 
     ImGui::End();
   }
+}
+
+int Dashboard::GetSpeedMultiplier() const {
+  return speed_multiplier;
 }
 
 } // namespace Scam
