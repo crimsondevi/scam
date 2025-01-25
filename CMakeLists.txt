@@ -26,6 +26,13 @@ set(SCAM_SRC
         src/Coin.h
         src/SoundSystem.cpp
         src/SoundSystem.h
+        src/sim/Item.cpp
+        src/sim/Item.h
+        src/sim/Modifier.cpp
+        src/sim/Modifier.h
+        src/sim/ScamInterface.h
+        src/sim/Simulation.cpp
+        src/sim/Simulation.h
         src/Texture.cpp
         src/Texture.h
 )
