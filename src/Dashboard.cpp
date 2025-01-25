@@ -1,11 +1,10 @@
 ﻿#include "Dashboard.h"
 
-#include "Gameloop.h"
+#include "SoundSystem.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <implot.h>
-#include <random>
 #include <vector>
 
 namespace Scam {
@@ -22,6 +21,10 @@ Dashboard::Dashboard() {
   }
 
   window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
+
+  sound_system = std::make_unique<SoundSystem>();
+
+  sound_system->PlayMusic();
 }
 
 void Dashboard::Update(const Coin& coin) {
@@ -97,7 +100,6 @@ void Dashboard::Update(const Coin& coin) {
     }
     ImGui::End();
   }
-
   // Action window
   {
     ImGui::SetNextWindowClass(&window_class);
@@ -110,11 +112,23 @@ void Dashboard::Update(const Coin& coin) {
 
     ImGui::BeginGroup();
     ImGui::PushFont(big_font);
-    ImGui::Button("Buy");
+
+    if (ImGui::Button("Buy")) {
+      sound_system->PlaySound(SoundCue::Click);
+    }
+
     ImGui::SameLine();
-    ImGui::Button("Sell");
+
+    if (ImGui::Button("Sell")) {
+      sound_system->PlaySound(SoundCue::Click);
+    }
+
     ImGui::SameLine();
-    ImGui::Button("Dump");
+
+    if (ImGui::Button("Dump")) {
+      sound_system->PlaySound(SoundCue::Purchase);
+    }
+
     ImGui::PopFont();
     ImGui::EndGroup();
 

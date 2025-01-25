@@ -24,6 +24,8 @@ set(SCAM_SRC
         src/Dashboard.h
         src/Coin.cpp
         src/Coin.h
+        src/SoundSystem.cpp
+        src/SoundSystem.h
 )
 
 add_executable(Scam WIN32 ${SCAM_SRC})
@@ -44,8 +46,12 @@ add_library(glad thirdparty/glad/src/glad.c)
 target_include_directories(glad PUBLIC thirdparty/glad/include)
 set(BUILD_SHARED_LIBS ON)
 
-#SDL
+# SDL
 add_subdirectory(thirdparty/SDL EXCLUDE_FROM_ALL)
+
+# SDL_mixer
+set(SDLMIXER_VENDORED OFF)
+add_subdirectory(thirdparty/SDL_mixer EXCLUDE_FROM_ALL)
 
 # IMGUI
 add_library(imgui
@@ -82,6 +88,7 @@ target_link_libraries(Scam
         imgui
         implot
         SDL3::SDL3
+        SDL3_mixer::SDL3_mixer
 )
 
 if (MSVC)

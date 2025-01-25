@@ -1,9 +1,9 @@
 ﻿#pragma once
 
 #include "Coin.h"
+#include "SoundSystem.h"
 
 #include <imgui.h>
-#include <random>
 
 namespace Scam {
 
@@ -21,6 +21,9 @@ private:
 
 private:
   ImGuiWindowClass window_class;
+
+private:
+  std::unique_ptr<SoundSystem> sound_system;
 };
 
 } // namespace Scam
