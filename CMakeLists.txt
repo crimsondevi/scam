@@ -24,6 +24,9 @@ add_executable(Scam WIN32 ${SCAM_SRC})
 
 set_property(TARGET Scam PROPERTY CXX_STANDARD 20)
 
+# OPENGL
+find_package(OpenGL REQUIRED)
+
 # SPDLOG
 set(SPDLOG_USE_STD_FORMAT ON)
 set(SPDLOG_BUILD_EXAMPLE OFF)
@@ -34,6 +37,9 @@ set(BUILD_SHARED_LIBS OFF)
 add_library(glad thirdparty/glad/src/glad.c)
 target_include_directories(glad PUBLIC thirdparty/glad/include)
 set(BUILD_SHARED_LIBS ON)
+
+#SDL
+add_subdirectory(thirdparty/SDL EXCLUDE_FROM_ALL)
 
 # IMGUI
 add_library(imgui
@@ -48,16 +54,20 @@ add_library(imgui
         thirdparty/imgui/misc/cpp/imgui_stdlib.cpp
 )
 
-#SDL
-add_subdirectory(thirdparty/SDL EXCLUDE_FROM_ALL)
-
 target_link_libraries(imgui SDL3::SDL3)
 target_include_directories(imgui PUBLIC thirdparty/imgui)
 target_include_directories(imgui PUBLIC thirdparty/imgui/backends)
 target_include_directories(imgui PUBLIC thirdparty/imgui/misc/cpp)
 target_include_directories(imgui PUBLIC ${SDL2_INCLUDE_DIRS})
 
-find_package(OpenGL REQUIRED)
+# IMPLOT
+add_library(implot STATIC
+        thirdparty/implot/implot.cpp
+        thirdparty/implot/implot_demo.cpp
+        thirdparty/implot/implot_items.cpp
+)
+target_link_libraries(implot imgui)
+target_include_directories(implot PUBLIC thirdparty/implot)
 
 target_link_libraries(Scam
         PRIVATE
@@ -65,6 +75,7 @@ target_link_libraries(Scam
         spdlog::spdlog
         glad
         imgui
+        implot
         SDL3::SDL3
 )
 

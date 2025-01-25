@@ -1,10 +1,12 @@
 #include "Prelude.h"
 
 #include "Gameloop.h"
-#include "imgui.h"
-#include "imgui_impl_opengl3.h"
-#include "imgui_impl_sdl3.h"
+
 #include <SDL3/SDL.h>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl3.h>
+#include <implot.h>
 
 int main(int argc, char* argv[]) {
   SDL_Window* window;
@@ -52,6 +54,8 @@ int main(int argc, char* argv[]) {
   font_cfg.SizePixels = 26.f;
   io.Fonts->AddFontDefault(&font_cfg);
 
+  ImPlot::CreateContext();
+
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
   // ImGui::StyleColorsLight();
@@ -66,6 +70,8 @@ int main(int argc, char* argv[]) {
   Scam::main_loop(window);
 
   // Cleanup
+
+  ImPlot::DestroyContext();
 
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL3_Shutdown();

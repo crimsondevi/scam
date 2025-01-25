@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
+#include <implot.h>
 #include <thread>
 
 namespace Scam {
@@ -37,6 +38,7 @@ void main_loop(SDL_Window* window) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     ImGui::ShowDemoWindow();
+    ImPlot::ShowDemoWindow();
 
     ImGui::Render();
 
