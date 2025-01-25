@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
   ImGuiIO& io = ImGui::GetIO();
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
   ImFontConfig font_cfg;
   font_cfg.SizePixels = 26.f;

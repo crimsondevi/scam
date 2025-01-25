@@ -44,21 +44,20 @@ add_subdirectory(thirdparty/SDL EXCLUDE_FROM_ALL)
 # IMGUI
 add_library(imgui
         STATIC
-        thirdparty/imgui/imgui.cpp
-        thirdparty/imgui/imgui_demo.cpp
-        thirdparty/imgui/imgui_draw.cpp
-        thirdparty/imgui/imgui_tables.cpp
-        thirdparty/imgui/imgui_widgets.cpp
-        thirdparty/imgui/backends/imgui_impl_opengl3.cpp
-        thirdparty/imgui/backends/imgui_impl_sdl3.cpp
-        thirdparty/imgui/misc/cpp/imgui_stdlib.cpp
+        thirdparty/imgui-docking/imgui.cpp
+        thirdparty/imgui-docking/imgui_demo.cpp
+        thirdparty/imgui-docking/imgui_draw.cpp
+        thirdparty/imgui-docking/imgui_tables.cpp
+        thirdparty/imgui-docking/imgui_widgets.cpp
+        thirdparty/imgui-docking/backends/imgui_impl_opengl3.cpp
+        thirdparty/imgui-docking/backends/imgui_impl_sdl3.cpp
+        thirdparty/imgui-docking/misc/cpp/imgui_stdlib.cpp
 )
 
 target_link_libraries(imgui SDL3::SDL3)
-target_include_directories(imgui PUBLIC thirdparty/imgui)
-target_include_directories(imgui PUBLIC thirdparty/imgui/backends)
-target_include_directories(imgui PUBLIC thirdparty/imgui/misc/cpp)
-target_include_directories(imgui PUBLIC ${SDL2_INCLUDE_DIRS})
+target_include_directories(imgui PUBLIC thirdparty/imgui-docking)
+target_include_directories(imgui PUBLIC thirdparty/imgui-docking/backends)
+target_include_directories(imgui PUBLIC thirdparty/imgui-docking/misc/cpp)
 
 # IMPLOT
 add_library(implot STATIC
