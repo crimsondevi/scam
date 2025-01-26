@@ -2,6 +2,7 @@
 
 #include "Prelude.h"
 #include "SoundSystem.h"
+#include "sim/Simulation.h"
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -35,7 +36,7 @@ Dashboard::Dashboard() {
   test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "bitcoin.png");
 }
 
-void Dashboard::Update(const Coin& coin) {
+void Dashboard::Update(const ScamSim& scam_sim) {
   ImGuiID dockspace_id = ImGui::DockSpaceOverViewport();
 
   static bool init = false;
@@ -70,22 +71,22 @@ void Dashboard::Update(const Coin& coin) {
       ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, final_size);
     }
     ImGui::PushFont(big_font);
-    ImGui::TextCenter(coin.name);
-    ImGui::TextCenter(coin.code);
+    ImGui::TextCenter(scam_sim.GetCoinState().name);
+    ImGui::TextCenter(scam_sim.GetCoinState().code);
     ImGui::PopFont();
 
     ImGui::SeparatorText("Market Value");
     ImGui::PushFont(big_font);
-    ImGui::TextCenter(std::format("${:.2f}", coin.stonks));
+    ImGui::TextCenter(std::format("${:.2f}", scam_sim.GetCoinState().value));
     ImGui::PopFont();
-    ImGui::TextCenter(std::format("Trend: {:+.4f}", coin.stonks_delta));
+    ImGui::TextCenter(std::format("Trend: {:+.4f}", scam_sim.GetCoinState().value_delta));
 
     ImGui::SeparatorText("Hype");
-    float hype = coin.hype;
+    float hype = scam_sim.GetCoinState().hype;
     ImGui::SliderFloat("##Hype", &hype, -1.f, 1.f, "%.2f", ImGuiSliderFlags_ReadOnly);
 
     ImGui::SeparatorText("Volatility");
-    float volatility = coin.volatility;
+    float volatility = scam_sim.GetCoinState().volatility;
     ImGui::SliderFloat("##Volatility", &volatility, 0.f, 10.f, "%.2f", ImGuiSliderFlags_ReadOnly);
 
     ImGui::PopItemWidth();
@@ -94,16 +95,16 @@ void Dashboard::Update(const Coin& coin) {
 
   // Update graph
 
-  if (coin.days == 0) {
+  if (scam_sim.GetCurrentStep() == 0) {
     x_data.emplace_back(updated_days);
-    y_data.emplace_back(coin.stonks);
+    y_data.emplace_back(scam_sim.GetCoinState().value);
   }
 
-  if (coin.days > updated_days) {
+  if (scam_sim.GetCurrentStep() > updated_days) {
     updated_days++;
 
     x_data.emplace_back(updated_days);
-    y_data.emplace_back(coin.stonks);
+    y_data.emplace_back(scam_sim.GetCoinState().value);
   }
 
   // Market window
@@ -129,7 +130,7 @@ void Dashboard::Update(const Coin& coin) {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Action");
 
-    ImGui::Text("Day: %u", coin.days);
+    ImGui::Text("Day: %u", scam_sim.GetCurrentStep());
 
     ImGui::BeginGroup();
     ImGui::RadioButton("Pause", &speed_multiplier, 0);

@@ -3,6 +3,7 @@
 #include "Coin.h"
 #include "Dashboard.h"
 #include "FrameCounter.h"
+#include "sim/Simulation.h"
 
 #include <glad/glad.h>
 #include <imgui.h>
@@ -16,9 +17,12 @@ namespace Scam {
 void main_loop(SDL_Window* window) {
   bool quit = false;
 
-  Coin coin;
-  coin.name = "Bubble";
-  coin.code = "BUBL";
+  float simulation_timer = 0.f;
+
+  ScamSim scam_sim;
+  scam_sim.StartNewCoin();
+  // scam_sim.AddModifier<Modifier_HypeMarket>();
+  scam_sim.StepSimulation();
 
   FrameCounter frame_counter;
   Dashboard dashboard;
@@ -43,7 +47,14 @@ void main_loop(SDL_Window* window) {
       }
     }
 
-    coin.Simulate(static_cast<float>(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier()));
+    const float update_delta_time =
+        static_cast<float>(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier());
+    simulation_timer += update_delta_time;
+
+    if (simulation_timer > .1f) {
+      simulation_timer -= .1f;
+      scam_sim.StepSimulation();
+    }
 
     // Begin frame
     {
@@ -84,7 +95,7 @@ void main_loop(SDL_Window* window) {
     // Dashboard
     {
       dashboard.ApplySettings(settings);
-      dashboard.Update(coin);
+      dashboard.Update(scam_sim);
     }
 
     // End frame

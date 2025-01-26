@@ -4,6 +4,7 @@
 #include "Gameloop.h"
 #include "SoundSystem.h"
 #include "Texture.h"
+#include "sim/Simulation.h"
 
 #include <imgui.h>
 
@@ -14,7 +15,7 @@ public:
   Dashboard();
 
 public:
-  void Update(const Coin& coin);
+  void Update(const ScamSim& scam_sim);
 
 public:
   void ApplySettings(const Settings& settings);
