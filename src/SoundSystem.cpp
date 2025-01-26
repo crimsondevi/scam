@@ -32,6 +32,16 @@ SoundSystem::SoundSystem() {
 
 SoundSystem::~SoundSystem() {
   SDL_CloseAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK);
+
+  if (music_sample) {
+    Mix_FreeMusic(music_sample);
+  }
+
+  for (auto sample : samples) {
+    if (sample.second) {
+      Mix_FreeChunk(sample.second);
+    }
+  }
 }
 
 void SoundSystem::PlayMusic() {
@@ -49,6 +59,14 @@ void SoundSystem::LoadSample(SoundCue sound_cue, const std::filesystem::path& pa
     LOG_INFO("Loaded audio sample: {}", path.string());
     samples.insert({sound_cue, chunk});
   }
+}
+
+void SoundSystem::SetMusicVolume(float volume) {
+  Mix_VolumeMusic(static_cast<int>(volume * MIX_MAX_VOLUME));
+}
+
+void SoundSystem::SetSoundVolume(float volume) {
+  Mix_Volume(1, static_cast<int>(volume * MIX_MAX_VOLUME));
 }
 
 } // namespace Scam

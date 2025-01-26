@@ -22,6 +22,8 @@ public:
 public:
   void PlayMusic();
   void PlaySound(const SoundCue& sound_cue);
+  void SetMusicVolume(float volume);
+  void SetSoundVolume(float volume);
 
 public:
   void LoadSample(SoundCue sound_cue, const std::filesystem::path& path);

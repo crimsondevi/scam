@@ -174,6 +174,11 @@ void Dashboard::Update(const Coin& coin) {
   }
 }
 
+void Dashboard::ApplySettings(const Settings& settings) {
+  sound_system->SetMusicVolume(settings.volume_music);
+  sound_system->SetSoundVolume(settings.volume_sound);
+}
+
 int Dashboard::GetSpeedMultiplier() const {
   return speed_multiplier;
 }

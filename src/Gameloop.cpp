@@ -22,6 +22,9 @@ void main_loop(SDL_Window* window) {
 
   FrameCounter frame_counter;
   Dashboard dashboard;
+  Settings settings;
+
+  bool show_settings_panel = false;
 
   while (!quit) {
     frame_counter.Update();
@@ -40,7 +43,7 @@ void main_loop(SDL_Window* window) {
       }
     }
 
-    coin.Simulate(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier());
+    coin.Simulate(static_cast<float>(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier()));
 
     // Begin frame
     {
@@ -57,12 +60,30 @@ void main_loop(SDL_Window* window) {
     // Main menu
     {
       ImGui::BeginMainMenuBar();
-      ImGui::Text("FPS: %d, delta time: %.4f ms", frame_counter.GetFps(), frame_counter.GetLastDeltaTime() * 1000.0);
+      if (ImGui::BeginMenu("File")) {
+        if (ImGui::MenuItem("Settings")) {
+          show_settings_panel = true;
+        }
+        ImGui::EndMenu();
+      }
+      ImGui::Separator();
+      ImGui::Text("FPS: %d", frame_counter.GetFps());
+      ImGui::Separator();
+      ImGui::Text("Delta Time: %.4f ms", frame_counter.GetLastDeltaTime() * 1000.0);
       ImGui::EndMainMenuBar();
+    }
+
+    if (show_settings_panel) {
+      ImGui::Begin("Settings", &show_settings_panel, ImGuiWindowFlags_AlwaysAutoResize);
+      ImGui::SeparatorText("Audio");
+      ImGui::SliderFloat("Music", &settings.volume_music, 0.f, 1.f);
+      ImGui::SliderFloat("Sound", &settings.volume_sound, 0.f, 1.f);
+      ImGui::End();
     }
 
     // Dashboard
     {
+      dashboard.ApplySettings(settings);
       dashboard.Update(coin);
     }
 

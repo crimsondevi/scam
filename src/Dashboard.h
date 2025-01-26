@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Coin.h"
+#include "Gameloop.h"
 #include "SoundSystem.h"
 #include "Texture.h"
 
@@ -14,6 +15,9 @@ public:
 
 public:
   void Update(const Coin& coin);
+
+public:
+  void ApplySettings(const Settings& settings);
 
 public:
   [[nodiscard]] int GetSpeedMultiplier() const;
