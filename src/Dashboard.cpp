@@ -71,8 +71,8 @@ void Dashboard::Update(const ScamSim& scam_sim) {
       ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, final_size);
     }
     ImGui::PushFont(big_font);
-    ImGui::TextCenter(scam_sim.GetCoinState().name);
-    ImGui::TextCenter(scam_sim.GetCoinState().code);
+    ImGui::TextCenter(scam_sim.GetCoinState().coin->name);
+    ImGui::TextCenter(scam_sim.GetCoinState().coin->code);
     ImGui::PopFont();
 
     ImGui::SeparatorText("Market Value");

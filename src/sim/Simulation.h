@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Coins.h"
 #include "Item.h"
 #include "Modifier.h"
 
@@ -9,8 +10,7 @@
 namespace Scam {
 
 struct CoinState {
-  std::string name = "Bubble$Coin";
-  std::string code = "BUBL";
+  std::shared_ptr<ScamCoin> coin;
   float value = 1.f;
   float value_delta = 0.f;
   float hype = 0.f;
@@ -40,7 +40,12 @@ public:
     return current_step;
   }
 
-  void StartNewCoin(/*TODO: take in coin type*/);
+  // void StartNewCoin(/*TODO: take in coin type*/);
+
+  void StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
+    coin_state = std::make_unique<CoinState>();
+    coin_state->coin = std::move(new_coin);
+  }
 
   // TODO: add more player interaction
 

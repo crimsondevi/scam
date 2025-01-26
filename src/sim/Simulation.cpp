@@ -4,13 +4,8 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
 
 namespace Scam {
-
-void ScamSim::StartNewCoin() {
-  coin_state = std::make_unique<CoinState>();
-}
 
 void ScamSim::StepSimulation() {
   ProcessTrade();

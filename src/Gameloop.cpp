@@ -20,7 +20,9 @@ void main_loop(SDL_Window* window) {
   float simulation_timer = 0.f;
 
   ScamSim scam_sim;
-  scam_sim.StartNewCoin();
+  auto coins = GetAvailableCoins();
+  scam_sim.StartNewCoin(std::move(coins[0]));
+  // scam_sim.StartNewCoin(std::make_unique<Coin_Bubble>());
   // scam_sim.AddModifier<Modifier_HypeMarket>();
   scam_sim.StepSimulation();
 
