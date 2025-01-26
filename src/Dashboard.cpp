@@ -207,9 +207,9 @@ void Dashboard::Update(ScamSim& scam_sim) {
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Dump")) {
-      sound_system->PlaySound(SoundCue::Purchase);
-    }
+    // if (ImGui::Button("Dump")) {
+    //   sound_system->PlaySound(SoundCue::Purchase);
+    // }
 
     ImGui::PopFont();
     ImGui::EndGroup();
