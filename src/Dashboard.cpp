@@ -165,9 +165,12 @@ void Dashboard::Update(ScamSim& scam_sim) {
     if (ImPlot::BeginPlot("Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
       float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
       float x_max = x_data.back() + 365.f / 2.f;
-      ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
+      float y_min = std::max(scam_sim.GetCoinState().value - 500.f, -20.f);
+      float y_max = *std::max_element(y_data.begin() + std::max(y_data.size()-200.f, 0.f), y_data.end()) + 200.f;
+      ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_Opposite);
       if (speed_multiplier > 0) {
         ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, y_min, y_max, ImGuiCond_Always);
       }
       ImPlot::SetNextLineStyle(ImVec4(.6f, .4f, .1f, 1.f), 2.f);
       ImPlot::PlotLine("BUBL", x_data.data(), y_data.data(), (int)x_data.size());
