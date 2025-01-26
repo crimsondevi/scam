@@ -101,7 +101,7 @@ void Dashboard::Update(const ScamSim& scam_sim) {
     y_data.emplace_back(scam_sim.GetCoinState().value);
   }
 
-  if (scam_sim.GetCurrentStep() > updated_days) {
+  while (scam_sim.GetCurrentStep() > updated_days) {
     updated_days++;
 
     x_data.emplace_back(updated_days);
