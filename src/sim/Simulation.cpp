@@ -1,4 +1,5 @@
 ﻿#include "Simulation.h"
+#include "../Prelude.h"
 #include "Item.h"
 #include "Modifier.h"
 
@@ -15,6 +16,23 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
       .name = "Shop",
       .type = EventType::Shop,
   }));
+}
+bool ScamSim::AddTradeOrder(float order) {
+  const float new_order = player_actions.trade_wish + order;
+
+  if (new_order > 0.f) {
+    if (new_order * coin_state->value <= real_money) {
+      player_actions.trade_wish = new_order;
+      return true;
+    }
+  } else if (new_order < 0.f) {
+    if (abs(new_order) <= fake_money) {
+      player_actions.trade_wish = new_order;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void ScamSim::AddModifier(std::unique_ptr<Modifier> modifier) {
@@ -35,7 +53,11 @@ void ScamSim::StepSimulation() {
 }
 
 void ScamSim::ProcessTrade() {
-  // TODO: trade
+  float order = player_actions.trade_wish;
+
+  fake_money += order;
+  real_money += order * coin_state->value * -1.f;
+
   player_actions.trade_wish = 0.f;
 }
 
@@ -65,8 +87,8 @@ void ScamSim::ApplyModifiers() {
 
 void ScamSim::UpdateCoin() {
   // TODO: implement the actual simulation
-  float change = 120.f - static_cast<float>(rand() % 200);
-  change += 100 * coin_state->hype;
+  float change = 10.f - static_cast<float>(rand() % 20);
+  change += 10 * coin_state->hype;
   const float newValue = coin_state->value + change;
   coin_state->value = std::max(0.f, newValue);
 }

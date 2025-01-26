@@ -16,7 +16,7 @@ struct CoinState {
   float value_delta = 0.f;
   float hype = 0.f;
   float volatility = 0.f;
-  float total = 100000;
+  float total = 100000.f;
 };
 
 struct PlayerActions {
@@ -43,16 +43,17 @@ public:
   [[nodiscard]] int GetCurrentStep() const {
     return current_step;
   }
-
-  // void StartNewCoin(/*TODO: take in coin type*/);
+  float GetRealMoney() const {
+    return real_money;
+  }
+  float GetFakeMoney() const {
+    return fake_money;
+  }
 
   void StartNewCoin(std::unique_ptr<ScamCoin> new_coin);
-
-  // TODO: add more player interaction
-
+  bool AddTradeOrder(float order);
   void AddModifier(std::unique_ptr<Modifier> modifier);
   void AddItem(std::unique_ptr<Item> item);
-
   void StepSimulation();
 
 private:
@@ -67,6 +68,8 @@ private:
   std::vector<std::unique_ptr<Item>> items;
   std::vector<std::unique_ptr<Event>> events;
   int max_items = 5;
+  float fake_money = 0.f;
+  float real_money = 100.f;
 
   // current step of the simulation, days by default but does not matter
   int current_step = 0;

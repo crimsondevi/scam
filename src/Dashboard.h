@@ -15,7 +15,7 @@ public:
   Dashboard();
 
 public:
-  void Update(const ScamSim& scam_sim);
+  void Update(ScamSim& scam_sim);
 
 public:
   void ApplySettings(const Settings& settings);

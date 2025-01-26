@@ -25,7 +25,7 @@ namespace Scam {
 Dashboard::Dashboard() {
   const ImGuiIO& io = ImGui::GetIO();
   ImFontConfig font_cfg;
-  font_cfg.SizePixels = 52.f;
+  font_cfg.SizePixels = 36.f;
   big_font = io.Fonts->AddFontDefault(&font_cfg);
 
   window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
@@ -37,7 +37,7 @@ Dashboard::Dashboard() {
   test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "bitcoin.png");
 }
 
-void Dashboard::Update(const ScamSim& scam_sim) {
+void Dashboard::Update(ScamSim& scam_sim) {
   ImGuiID dockspace_id = ImGui::DockSpaceOverViewport();
 
   static bool init = false;
@@ -75,6 +75,11 @@ void Dashboard::Update(const ScamSim& scam_sim) {
     ImGui::TextCenter(scam_sim.GetCoinState().coin->name);
     ImGui::TextCenter(scam_sim.GetCoinState().coin->code);
     ImGui::PopFont();
+
+    std::string real_money_str = std::format("Cash - ${:.2f}", scam_sim.GetRealMoney());
+    ImGui::SeparatorText(real_money_str.c_str());
+    std::string fake_money_str = std::format("{} - {:.2f}", scam_sim.GetCoinState().coin->code, scam_sim.GetFakeMoney());
+    ImGui::SeparatorText(fake_money_str.c_str());
 
     ImGui::SeparatorText("Market Value");
     ImGui::PushFont(big_font);
@@ -187,13 +192,17 @@ void Dashboard::Update(const ScamSim& scam_sim) {
     ImGui::PushFont(big_font);
 
     if (ImGui::Button("Buy")) {
-      sound_system->PlaySound(SoundCue::Click);
+      if (scam_sim.AddTradeOrder(1.f)) {
+        sound_system->PlaySound(SoundCue::Click);
+      }
     }
 
     ImGui::SameLine();
 
     if (ImGui::Button("Sell")) {
-      sound_system->PlaySound(SoundCue::Click);
+      if (scam_sim.AddTradeOrder(-1.f)) {
+        sound_system->PlaySound(SoundCue::Click);
+      }
     }
 
     ImGui::SameLine();
