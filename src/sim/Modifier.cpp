@@ -12,7 +12,7 @@ ScamInterfaceData Modifier_SlowHype::GetInterfaceData() const {
   return {"Slow Hype", "Slow increase of hype over 90 days."};
 }
 void Modifier_SlowHype::ApplyModifier(CoinState& state) {
-  state.hype += 0.15f;
+  state.hype += .1f;
 }
 
 // HYPE MARKET
@@ -23,7 +23,7 @@ ScamInterfaceData Modifier_HypeMarket::GetInterfaceData() const {
   return {"Hype Market", "Increase hype over time..."};
 }
 void Modifier_HypeMarket::ApplyModifier(CoinState& state) {
-  state.hype += 1;
+  state.hype += .5;
 }
 
 // CRAZY MARKET
@@ -34,7 +34,7 @@ ScamInterfaceData Modifier_CrazyMarket::GetInterfaceData() const {
   return {"Crazy Market", "Increases price volatility..."};
 }
 void Modifier_CrazyMarket::ApplyModifier(CoinState& state) {
-  state.volatility += 1;
+  state.volatility += 5.f;
 }
 
 } // namespace Scam

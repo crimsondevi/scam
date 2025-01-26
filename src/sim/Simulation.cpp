@@ -85,6 +85,7 @@ bool ScamSim::HasBubbleBurst() const {
 
 void ScamSim::ProcessTrade() {
   float order = player_actions.trade_wish;
+  coin_state->hype += order;
 
   fake_money += order;
   real_money += order * coin_state->value * -1.f;
@@ -118,7 +119,7 @@ void ScamSim::ApplyModifiers() {
 
 void ScamSim::UpdateCoin() {
   coin_state->hype += -.1f;
-  coin_state->volatility = std::lerp(coin_state->volatility, 5.f, .01f);
+  coin_state->volatility = std::lerp(coin_state->volatility, 10.f, .005f);
 
   std::normal_distribution dist(coin_state->hype, coin_state->volatility);
   coin_state->value_delta = dist(rng);

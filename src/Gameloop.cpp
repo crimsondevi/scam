@@ -70,8 +70,8 @@ void main_loop(SDL_Window* window) {
           static_cast<float>(frame_counter.GetLastDeltaTime() * dashboard->GetSpeedMultiplier());
       simulation_timer += update_delta_time;
 
-      while (simulation_timer > .1f) {
-        simulation_timer -= .1f;
+      while (simulation_timer > .2f) {
+        simulation_timer -= .2f;
         scam_sim->StepSimulation();
 
         for (const auto& event : scam_sim->GetEvents()) {

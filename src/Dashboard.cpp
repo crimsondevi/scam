@@ -85,7 +85,7 @@ void Dashboard::Update(ScamSim& scam_sim) {
 
     ImGui::SeparatorText("Hype");
     float hype = scam_sim.GetCoinState().hype;
-    ImGui::SliderFloat("##Hype", &hype, -1.f, 1.f, "%.2f", ImGuiSliderFlags_ReadOnly);
+    ImGui::SliderFloat("##Hype", &hype, -30.f, 30.f, "%.2f", ImGuiSliderFlags_ReadOnly);
 
     ImGui::SeparatorText("Volatility");
     float volatility = scam_sim.GetCoinState().volatility;

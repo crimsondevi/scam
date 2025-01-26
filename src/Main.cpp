@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  SDL_GL_SetSwapInterval(1); // Enable vsync
+  SDL_GL_SetSwapInterval(0); // Enable vsync
   SDL_ShowWindow(window);
 
   // Setup Dear ImGui context
