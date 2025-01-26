@@ -220,7 +220,7 @@ void Dashboard::Update(ScamSim& scam_sim) {
     ImGui::BeginGroup();
     ImGui::PushFont(big_font);
 
-    if (ImGui::Button("Buy")) {
+    if (ImGui::Button("Buy", {200.f, 100.f})) {
       if (scam_sim.AddTradeOrder(1.f)) {
         sound_system->PlaySound(SoundCue::Click);
       }
@@ -228,7 +228,7 @@ void Dashboard::Update(ScamSim& scam_sim) {
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Sell")) {
+    if (ImGui::Button("Sell", {200.f, 100.f})) {
       if (scam_sim.AddTradeOrder(-1.f)) {
         sound_system->PlaySound(SoundCue::Click);
       }
