@@ -49,11 +49,11 @@ void main_loop(SDL_Window* window) {
       }
     }
 
-    const float update_delta_time =
+    const auto update_delta_time =
         static_cast<float>(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier());
     simulation_timer += update_delta_time;
 
-    if (simulation_timer > .1f) {
+    while (simulation_timer > .1f) {
       simulation_timer -= .1f;
       scam_sim.StepSimulation();
     }

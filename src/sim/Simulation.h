@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Coins.h"
+#include "Event.h"
 #include "Item.h"
 #include "Modifier.h"
 
@@ -33,6 +34,9 @@ public:
   const std::vector<std::unique_ptr<Item>>& GetItems() const {
     return items;
   }
+  const std::vector<std::unique_ptr<Event>>& GetEvents() const {
+    return events;
+  }
   int GetMaxItems() const {
     return max_items;
   }
@@ -42,10 +46,7 @@ public:
 
   // void StartNewCoin(/*TODO: take in coin type*/);
 
-  void StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
-    coin_state = std::make_unique<CoinState>();
-    coin_state->coin = std::move(new_coin);
-  }
+  void StartNewCoin(std::unique_ptr<ScamCoin> new_coin);
 
   // TODO: add more player interaction
 
@@ -71,6 +72,7 @@ private:
   std::unique_ptr<CoinState> coin_state;
   std::vector<std::unique_ptr<Modifier>> modifiers;
   std::vector<std::unique_ptr<Item>> items;
+  std::vector<std::unique_ptr<Event>> events;
   int max_items = 5;
 
   // current step of the simulation, days by default but does not matter

@@ -38,6 +38,9 @@ private:
   Texture test_texture;
 
   int speed_multiplier = 1;
+
+  const Event* current_event = nullptr;
+  int pre_event_speed_multiplier = 1;
 };
 
 } // namespace Scam

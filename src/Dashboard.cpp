@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <implot.h>
+#include <implot_internal.h>
 #include <vector>
 
 namespace ImGui {
@@ -100,11 +101,32 @@ void Dashboard::Update(const ScamSim& scam_sim) {
     y_data.emplace_back(scam_sim.GetCoinState().value);
   }
 
-  if (scam_sim.GetCurrentStep() > updated_days) {
+  while (scam_sim.GetCurrentStep() > updated_days) {
     updated_days++;
 
     x_data.emplace_back(updated_days);
     y_data.emplace_back(scam_sim.GetCoinState().value);
+
+    for (const auto& event : scam_sim.GetEvents()) {
+      if (updated_days == event->day) {
+        LOG_INFO("Event occurred on day: {}", event->day);
+        pre_event_speed_multiplier = speed_multiplier;
+        speed_multiplier = 0;
+        current_event = event.get();
+      }
+    }
+  }
+
+  if (current_event) {
+    ImGui::OpenPopup("Event");
+
+    if (ImGui::BeginPopupModal("Event", nullptr, ImGuiWindowFlags_Modal)) {
+      if (ImGui::Button("Close")) {
+        current_event = nullptr;
+        speed_multiplier = pre_event_speed_multiplier;
+      }
+      ImGui::End();
+    }
   }
 
   // Market window
@@ -112,14 +134,28 @@ void Dashboard::Update(const ScamSim& scam_sim) {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Market");
     if (ImPlot::BeginPlot("Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
-      float x_min = std::max(x_data.back() - 365.f, 0.f);
-      float x_max = x_data.back();
+      float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
+      float x_max = x_data.back() + 365.f / 2.f;
       ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
       if (speed_multiplier > 0) {
         ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
       }
       ImPlot::SetNextLineStyle(ImVec4(.6f, .4f, .1f, 1.f), 2.f);
       ImPlot::PlotLine("BUBL", x_data.data(), y_data.data(), (int)x_data.size());
+      ImPlot::SetNextLineStyle(ImVec4(1.f, 1.f, 1.f, 1.f), 2.f);
+      ImPlot::PlotInfLines("##Today", &x_data.back(), 1);
+      ImPlot::PlotText("Today", x_data.back(), 0.f, ImVec2(16.f, 0.f), ImPlotTextFlags_Vertical);
+
+      for (const auto& event : scam_sim.GetEvents()) {
+        if (event->day >= x_min && event->day <= x_max) {
+          const std::string day_name = std::format("##event_day_{}", event->day);
+          const auto day = static_cast<float>(event->day);
+          ImPlot::SetNextLineStyle(ImVec4(0.f, 1.f, 0.f, 1.f), 2.f);
+          ImPlot::PlotInfLines(day_name.c_str(), &day, 1);
+          ImPlot::PlotText(event->name.c_str(), day, 0.f, ImVec2(16.f, 0.f), ImPlotTextFlags_Vertical);
+        }
+      }
+
       ImPlot::EndPlot();
     }
     ImGui::End();
