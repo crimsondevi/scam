@@ -6,6 +6,7 @@
 #include "Modifier.h"
 
 #include <memory>
+#include <random>
 #include <vector>
 
 namespace Scam {
@@ -14,9 +15,9 @@ struct CoinState {
   std::shared_ptr<ScamCoin> coin;
   float value = 1.f;
   float value_delta = 0.f;
-  float hype = 0.f;
-  float volatility = 0.f;
-  float total = 100000.f;
+  float hype = 10.f;
+  float volatility = .1f;
+  float total = 100000;
 };
 
 struct PlayerActions {
@@ -24,6 +25,9 @@ struct PlayerActions {
 };
 
 class ScamSim {
+public:
+  ScamSim();
+
 public:
   const CoinState& GetCoinState() const {
     return *coin_state;
@@ -73,6 +77,8 @@ private:
 
   // current step of the simulation, days by default but does not matter
   int current_step = 0;
+
+  std::mt19937 rng;
 };
 
 } // namespace Scam

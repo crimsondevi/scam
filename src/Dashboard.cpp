@@ -125,8 +125,36 @@ void Dashboard::Update(ScamSim& scam_sim) {
   if (current_event) {
     ImGui::OpenPopup("Event");
 
-    if (ImGui::BeginPopupModal("Event", nullptr, ImGuiWindowFlags_Modal)) {
-      if (ImGui::Button("Close")) {
+    if (ImGui::BeginPopupModal("Event", nullptr, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize)) {
+      bool bought = false;
+      size_t chosen_item_index = -1;
+
+      for (int i = 0; i < current_event->items.size(); i++) {
+        const auto& item = *current_event->items[i];
+
+        const std::string item_label = std::format("Buy##{}", i);
+
+        ImGui::BeginGroup();
+        if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
+          ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, ImVec2(64.f, 64.f));
+        }
+        ImGui::Text("%s", item.GetInterfaceData().name.c_str());
+        if (ImGui::Button(item_label.c_str())) {
+          chosen_item_index = i;
+          bought = true;
+        }
+        ImGui::EndGroup();
+
+        if (ImGui::IsItemHovered()) {
+          if (ImGui::BeginTooltip()) {
+            ImGui::Text("%s", item.GetInterfaceData().description.c_str());
+            ImGui::EndTooltip();
+          }
+        }
+      }
+      if (bought) {
+        auto item = std::move(current_event->items.at(chosen_item_index));
+        scam_sim.AddItem(std::move(item));
         current_event = nullptr;
         speed_multiplier = pre_event_speed_multiplier;
       }

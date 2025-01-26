@@ -1,6 +1,8 @@
 ﻿#pragma once
 
+#include <memory>
 #include <string>
+#include <vector>
 
 namespace Scam {
 
@@ -15,6 +17,7 @@ public:
   int day{};
   std::string name;
   EventType type{};
+  std::vector<std::unique_ptr<class Item>> items;
 };
 
 } // namespace Scam
