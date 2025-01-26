@@ -10,6 +10,11 @@ namespace Scam {
 
 void ScamSim::StartNewCoin() {
   coin_state = std::make_unique<CoinState>();
+  events.emplace_back(std::make_unique<Event>(Event{
+      .day = 100,
+      .name = "Shop",
+      .type = EventType::Shop,
+  }));
 }
 
 void ScamSim::StepSimulation() {
@@ -17,7 +22,7 @@ void ScamSim::StepSimulation() {
   UseItems();
   ApplyModifiers();
   UpdateCoin();
-  
+
   current_step++;
 }
 
@@ -31,8 +36,7 @@ void ScamSim::UseItems() {
     Item* item = it->get();
     if (item->TryUseItem(*this)) {
       it = items.erase(it);
-    }
-    else {
+    } else {
       ++it;
     }
   }
@@ -42,11 +46,10 @@ void ScamSim::ApplyModifiers() {
   for (auto it = modifiers.begin(); it != modifiers.end();) {
     Modifier* modifier = it->get();
     modifier->ApplyModifier(*coin_state);
-    
+
     if (modifier->steps_left-- == 0) {
       it = modifiers.erase(it);
-    }
-    else {
+    } else {
       ++it;
     }
   }

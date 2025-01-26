@@ -35,6 +35,8 @@ set(SCAM_SRC
         src/sim/Simulation.h
         src/Texture.cpp
         src/Texture.h
+        src/sim/Event.cpp
+        src/sim/Event.h
 )
 
 add_executable(Scam WIN32 ${SCAM_SRC})
