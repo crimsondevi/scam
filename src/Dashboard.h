@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Coin.h"
 #include "Gameloop.h"
 #include "SoundSystem.h"
 #include "Texture.h"
@@ -15,7 +14,7 @@ public:
   Dashboard();
 
 public:
-  void Update(const ScamSim& scam_sim);
+  void Update(ScamSim& scam_sim);
 
 public:
   void ApplySettings(const Settings& settings);
@@ -39,7 +38,7 @@ private:
 
   int speed_multiplier = 1;
 
-  const Event* current_event = nullptr;
+  Event* current_event = nullptr;
   int pre_event_speed_multiplier = 1;
 };
 

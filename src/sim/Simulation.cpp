@@ -9,11 +9,17 @@ namespace Scam {
 
 void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
   coin_state = std::make_unique<CoinState>();
+  auto items = std::vector<std::unique_ptr<Item>>();
+  items.emplace_back(std::make_unique<Item_HypeCampaign>());
+  items.emplace_back(std::make_unique<Item_HypeCampaign>());
+  items.emplace_back(std::make_unique<Item_HypeCampaign>());
+  items.emplace_back(std::make_unique<Item_HypeCampaign>());
   coin_state->coin = std::move(new_coin);
   events.emplace_back(std::make_unique<Event>(Event{
       .day = 100,
       .name = "Shop",
       .type = EventType::Shop,
+      .items = std::move(items),
   }));
 }
 
