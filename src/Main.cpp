@@ -10,10 +10,6 @@
 #include <implot.h>
 
 int main(int argc, char* argv[]) {
-  SDL_Window* window;
-
-  // Initialize SDL3
-
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
@@ -25,7 +21,7 @@ int main(int argc, char* argv[]) {
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-  window = SDL_CreateWindow("Scam", 1920, 1080, SDL_WINDOW_OPENGL | SDL_EVENT_WINDOW_RESIZED);
+  SDL_Window* window = SDL_CreateWindow("Scam", 1920, 1080, SDL_WINDOW_OPENGL | SDL_EVENT_WINDOW_RESIZED);
 
   if (!window) {
     LOG_ERROR("Could not create scamming window: {}", SDL_GetError());
@@ -46,7 +42,7 @@ int main(int argc, char* argv[]) {
     return -1;
   }
 
-  SDL_GL_SetSwapInterval(0); // Enable vsync
+  SDL_GL_SetSwapInterval(1); // Enable vsync
   SDL_ShowWindow(window);
 
   // Setup Dear ImGui context
