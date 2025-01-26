@@ -40,5 +40,20 @@ ScamInterfaceData Item_CrazyCampaign::GetInterfaceData() const {
 void Item_CrazyCampaign::ApplyItem(ScamSim& sim) {
   sim.AddModifier(std::make_unique<Modifier_CrazyMarket>());
 }
+ScamInterfaceData Item_DoubleMoney::GetInterfaceData() const {
+  return {"Double Money", "Start a campaign to copy every dollar bill you have!"};
+}
+
+void Item_DoubleMoney::ApplyItem(ScamSim& sim) {
+  sim.real_money *= 2.f;
+}
+
+ScamInterfaceData Item_HalfThreshold::GetInterfaceData() const {
+  return {"Half Threshold", "Start a campaign to relax the audits!"};
+}
+
+void Item_HalfThreshold::ApplyItem(ScamSim& sim) {
+  sim.bubble_threshold /= 2.f;
+}
 
 } // namespace Scam

@@ -74,6 +74,8 @@ private:
   std::vector<std::unique_ptr<Modifier>> modifiers;
   std::vector<std::unique_ptr<Item>> items;
   std::vector<std::unique_ptr<Event>> events;
+
+public:
   int max_items = 5;
   float fake_money = 0.f;
   float real_money = 100.f;

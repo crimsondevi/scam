@@ -40,4 +40,16 @@ public:
   void ApplyItem(ScamSim& sim) override;
 };
 
+class Item_DoubleMoney : public Item {
+  public:
+  ScamInterfaceData GetInterfaceData() const override;
+  void ApplyItem(ScamSim& sim) override;
+};
+
+class Item_HalfThreshold : public Item {
+public:
+  ScamInterfaceData GetInterfaceData() const override;
+  void ApplyItem(ScamSim& sim) override;
+};
+
 } // namespace Scam

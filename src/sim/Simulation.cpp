@@ -25,19 +25,18 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
   // initial hype modifier
   AddModifier(std::make_unique<Modifier_SlowHype>());
 
-  for (int i = 0; i < 5; i++) {
-    auto items = std::vector<std::unique_ptr<Item>>();
-    items.emplace_back(std::make_unique<Item_HypeCampaign>());
-    items.emplace_back(std::make_unique<Item_CrazyCampaign>());
-    items.emplace_back(std::make_unique<Item_HypeCampaign>());
-    items.emplace_back(std::make_unique<Item_CrazyCampaign>());
-    events.emplace_back(std::make_unique<Event>(Event{
-        .day = 100 + 50 * i,
-        .name = "Shop",
-        .type = EventType::Shop,
-        .items = std::move(items),
-    }));
-  }
+  auto items = std::vector<std::unique_ptr<Item>>();
+  items.emplace_back(std::make_unique<Item_HypeCampaign>());
+  items.emplace_back(std::make_unique<Item_CrazyCampaign>());
+  items.emplace_back(std::make_unique<Item_DoubleMoney>());
+  items.emplace_back(std::make_unique<Item_HalfThreshold>());
+  events.emplace_back(std::make_unique<Event>(Event{
+      .day = 50,
+      .name = "Shop",
+      .type = EventType::Shop,
+      .items = std::move(items),
+  }));
+
 }
 bool ScamSim::AddTradeOrder(float order) {
   const float new_order = player_actions.trade_wish + order;
@@ -124,7 +123,7 @@ void ScamSim::UpdateCoin() {
   std::normal_distribution dist(coin_state->hype, coin_state->volatility);
   coin_state->value_delta = dist(rng);
   coin_state->value += coin_state->value_delta;
-  coin_state->value = std::max(0.f, coin_state->value);
+  coin_state->value = std::max(0.01f, coin_state->value);
 
   if ((current_step + 365) % 365 == 0) {
     events.emplace_back(std::make_unique<Event>(Event{
@@ -132,6 +131,20 @@ void ScamSim::UpdateCoin() {
         .name = "Audit",
         .type = EventType::Audit,
         .items = {},
+    }));
+  }
+
+  if ((current_step + 200) % 400 == 0) {
+    auto items = std::vector<std::unique_ptr<Item>>();
+    items.emplace_back(std::make_unique<Item_HypeCampaign>());
+    items.emplace_back(std::make_unique<Item_CrazyCampaign>());
+    items.emplace_back(std::make_unique<Item_DoubleMoney>());
+    items.emplace_back(std::make_unique<Item_HalfThreshold>());
+    events.emplace_back(std::make_unique<Event>(Event{
+        .day = current_step + 200,
+        .name = "Shop",
+        .type = EventType::Shop,
+        .items = std::move(items),
     }));
   }
 }
