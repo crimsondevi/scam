@@ -17,6 +17,14 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
   }));
 }
 
+void ScamSim::AddModifier(std::unique_ptr<Modifier> modifier) {
+  modifiers.emplace_back(std::move(modifier));
+}
+
+void ScamSim::AddItem(std::unique_ptr<Item> item) {
+  items.emplace_back(std::move(item));
+}
+
 void ScamSim::StepSimulation() {
   ProcessTrade();
   UseItems();

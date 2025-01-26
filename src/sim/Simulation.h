@@ -50,15 +50,8 @@ public:
 
   // TODO: add more player interaction
 
-  template <class T> void AddModifier() {
-    static_assert(std::is_base_of<Modifier, T>::value);
-
-    modifiers.push_back(std::make_unique<T>());
-  }
-
-  template <class T> void AddItem() {
-    items.push_back(std::make_unique<T>());
-  }
+  void AddModifier(std::unique_ptr<Modifier> modifier);
+  void AddItem(std::unique_ptr<Item> item);
 
   void StepSimulation();
 

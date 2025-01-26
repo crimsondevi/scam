@@ -28,7 +28,7 @@ ScamInterfaceData Item_HypeCampaign::GetInterfaceData() const {
 }
 
 void Item_HypeCampaign::ApplyItem(ScamSim& sim) {
-  sim.AddModifier<Modifier_HypeMarket>();
+  sim.AddModifier(std::make_unique<Modifier_HypeMarket>());
 }
 
 } // namespace Scam
