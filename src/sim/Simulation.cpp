@@ -22,6 +22,9 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
   coin_state = std::make_unique<CoinState>();
   coin_state->coin = std::move(new_coin);
 
+  // initial hype modifier
+  AddModifier(std::make_unique<Modifier_SlowHype>());
+
   for (int i = 0; i < 5; i++) {
     auto items = std::vector<std::unique_ptr<Item>>();
     items.emplace_back(std::make_unique<Item_HypeCampaign>());

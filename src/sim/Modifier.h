@@ -13,6 +13,13 @@ public:
   int steps_left = 0;
 };
 
+class Modifier_SlowHype : public Modifier {
+public:
+  Modifier_SlowHype();
+  ScamInterfaceData GetInterfaceData() const override;
+  void ApplyModifier(CoinState& state) override;
+};
+
 class Modifier_HypeMarket : public Modifier {
 public:
   Modifier_HypeMarket();

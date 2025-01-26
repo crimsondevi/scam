@@ -15,7 +15,7 @@ struct CoinState {
   std::shared_ptr<ScamCoin> coin;
   float value = 1.f;
   float value_delta = 0.f;
-  float hype = 10.f;
+  float hype = 0.f;
   float volatility = .1f;
   float total = 100000;
 };
