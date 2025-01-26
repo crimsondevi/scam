@@ -34,4 +34,10 @@ public:
   void ApplyItem(ScamSim& sim) override;
 };
 
+class Item_CrazyCampaign : public Item {
+public:
+  ScamInterfaceData GetInterfaceData() const override;
+  void ApplyItem(ScamSim& sim) override;
+};
+
 } // namespace Scam

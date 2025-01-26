@@ -12,8 +12,10 @@ void Item::DeactivateItem() {
 }
 
 void Item::ToggleItem() {
-  if (is_active) DeactivateItem();
-  else ActivateItem();
+  if (is_active)
+    DeactivateItem();
+  else
+    ActivateItem();
 }
 
 bool Item::TryUseItem(ScamSim& sim) {
@@ -29,6 +31,14 @@ ScamInterfaceData Item_HypeCampaign::GetInterfaceData() const {
 
 void Item_HypeCampaign::ApplyItem(ScamSim& sim) {
   sim.AddModifier(std::make_unique<Modifier_HypeMarket>());
+}
+
+ScamInterfaceData Item_CrazyCampaign::GetInterfaceData() const {
+  return {"Crazy Campaign", "Start a crazy campaign that will destabilize the markets!"};
+}
+
+void Item_CrazyCampaign::ApplyItem(ScamSim& sim) {
+  sim.AddModifier(std::make_unique<Modifier_CrazyMarket>());
 }
 
 } // namespace Scam

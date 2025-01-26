@@ -20,4 +20,11 @@ public:
   void ApplyModifier(CoinState& state) override;
 };
 
+class Modifier_CrazyMarket : public Modifier {
+public:
+  Modifier_CrazyMarket();
+  ScamInterfaceData GetInterfaceData() const override;
+  void ApplyModifier(CoinState& state) override;
+};
+
 } // namespace Scam
