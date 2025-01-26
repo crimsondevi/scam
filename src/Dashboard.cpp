@@ -29,7 +29,7 @@ Dashboard::Dashboard(ImFont* big_font) : big_font(big_font) {
 
   sound_system->PlayMusic();
 
-  test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "bitcoin.png");
+  test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "coin.png");
 }
 
 void Dashboard::Update(ScamSim& scam_sim) {
