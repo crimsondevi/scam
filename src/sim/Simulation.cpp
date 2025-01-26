@@ -68,7 +68,17 @@ void ScamSim::StepSimulation() {
   ApplyModifiers();
   UpdateCoin();
 
+  bubble_threshold += .25f;
+
   current_step++;
+}
+
+float ScamSim::GetBubbleThreshold() const {
+  return bubble_threshold;
+}
+
+bool ScamSim::HasBubbleBurst() const {
+  return coin_state->value <= bubble_threshold;
 }
 
 void ScamSim::ProcessTrade() {
@@ -112,6 +122,15 @@ void ScamSim::UpdateCoin() {
   coin_state->value_delta = dist(rng);
   coin_state->value += coin_state->value_delta;
   coin_state->value = std::max(0.f, coin_state->value);
+
+  if ((current_step + 365) % 365 == 0) {
+    events.emplace_back(std::make_unique<Event>(Event{
+        .day = current_step + 365,
+        .name = "Audit",
+        .type = EventType::Audit,
+        .items = {},
+    }));
+  }
 }
 
 } // namespace Scam

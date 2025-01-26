@@ -10,6 +10,7 @@ enum EventType {
   None,
   Shop,
   Mod,
+  Audit,
 };
 
 class Event {

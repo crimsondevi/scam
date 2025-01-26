@@ -11,7 +11,7 @@ namespace Scam {
 
 class Dashboard {
 public:
-  Dashboard();
+  Dashboard(ImFont* big_font);
 
 public:
   void Update(ScamSim& scam_sim);

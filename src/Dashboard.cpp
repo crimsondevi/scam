@@ -22,12 +22,7 @@ void TextCenter(std::string_view view) {
 
 namespace Scam {
 
-Dashboard::Dashboard() {
-  const ImGuiIO& io = ImGui::GetIO();
-  ImFontConfig font_cfg;
-  font_cfg.SizePixels = 36.f;
-  big_font = io.Fonts->AddFontDefault(&font_cfg);
-
+Dashboard::Dashboard(ImFont* big_font) : big_font(big_font) {
   window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
 
   sound_system = std::make_unique<SoundSystem>();
@@ -78,7 +73,8 @@ void Dashboard::Update(ScamSim& scam_sim) {
 
     std::string real_money_str = std::format("Cash - ${:.2f}", scam_sim.GetRealMoney());
     ImGui::SeparatorText(real_money_str.c_str());
-    std::string fake_money_str = std::format("{} - {:.2f}", scam_sim.GetCoinState().coin->code, scam_sim.GetFakeMoney());
+    std::string fake_money_str =
+        std::format("{} - {:.2f}", scam_sim.GetCoinState().coin->code, scam_sim.GetFakeMoney());
     ImGui::SeparatorText(fake_money_str.c_str());
 
     ImGui::SeparatorText("Market Value");
@@ -113,7 +109,7 @@ void Dashboard::Update(ScamSim& scam_sim) {
     y_data.emplace_back(scam_sim.GetCoinState().value);
 
     for (const auto& event : scam_sim.GetEvents()) {
-      if (updated_days == event->day) {
+      if (event->type == EventType::Shop && updated_days == event->day) {
         LOG_INFO("Event occurred on day: {}", event->day);
         pre_event_speed_multiplier = speed_multiplier;
         speed_multiplier = 0;
@@ -177,13 +173,18 @@ void Dashboard::Update(ScamSim& scam_sim) {
       ImPlot::PlotLine("BUBL", x_data.data(), y_data.data(), (int)x_data.size());
       ImPlot::SetNextLineStyle(ImVec4(1.f, 1.f, 1.f, 1.f), 2.f);
       ImPlot::PlotInfLines("##Today", &x_data.back(), 1);
-      ImPlot::PlotText("Today", x_data.back(), 0.f, ImVec2(16.f, 0.f), ImPlotTextFlags_Vertical);
+      ImPlot::PlotText("Today", x_data.back(), 0.f, ImVec2(16.f, -80.f), ImPlotTextFlags_Vertical);
+
+      const float bubble_threshold = scam_sim.GetBubbleThreshold();
+      ImPlot::PlotInfLines("##Bubble Threshold", &bubble_threshold, 1, ImPlotInfLinesFlags_Horizontal);
+      ImPlot::PlotText("Bubble Threshold", x_data.back(), bubble_threshold, ImVec2(0.f, 16.f));
 
       for (const auto& event : scam_sim.GetEvents()) {
         if (event->day >= x_min && event->day <= x_max) {
           const std::string day_name = std::format("##event_day_{}", event->day);
           const auto day = static_cast<float>(event->day);
-          ImPlot::SetNextLineStyle(ImVec4(0.f, 1.f, 0.f, 1.f), 2.f);
+          auto line_color = event->type == EventType::Audit ? ImVec4(1.f, 0.f, 0.f, 1.f) : ImVec4(0.f, 1.f, 0.f, 1.f);
+          ImPlot::SetNextLineStyle(line_color, 2.f);
           ImPlot::PlotInfLines(day_name.c_str(), &day, 1);
           ImPlot::PlotText(event->name.c_str(), day, 0.f, ImVec2(16.f, 0.f), ImPlotTextFlags_Vertical);
         }

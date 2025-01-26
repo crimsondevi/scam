@@ -15,20 +15,25 @@
 namespace Scam {
 
 void main_loop(SDL_Window* window) {
-  bool quit = false;
-
-  float simulation_timer = 0.f;
-
-  ScamSim scam_sim;
-  auto coins = GetAvailableCoins();
-  scam_sim.StartNewCoin(std::move(coins[0]));
-  scam_sim.StepSimulation();
+  const ImGuiIO& io = ImGui::GetIO();
+  ImFontConfig font_cfg;
+  font_cfg.SizePixels = 36.f;
+  auto big_font = io.Fonts->AddFontDefault(&font_cfg);
 
   FrameCounter frame_counter;
-  Dashboard dashboard;
-  Settings settings;
-
   bool show_settings_panel = false;
+  Settings settings;
+  bool quit = false;
+
+  std::unique_ptr<Dashboard> dashboard = std::make_unique<Dashboard>(big_font);
+  std::unique_ptr<ScamSim> scam_sim = std::make_unique<ScamSim>();
+  auto coins = GetAvailableCoins();
+  scam_sim->StartNewCoin(std::move(coins[0]));
+  scam_sim->StepSimulation();
+
+  float simulation_timer = 0.f;
+  bool game_over = false;
+  bool try_again = false;
 
   while (!quit) {
     frame_counter.Update();
@@ -47,13 +52,35 @@ void main_loop(SDL_Window* window) {
       }
     }
 
-    const auto update_delta_time =
-        static_cast<float>(frame_counter.GetLastDeltaTime() * dashboard.GetSpeedMultiplier());
-    simulation_timer += update_delta_time;
+    if (try_again) {
+      try_again = false;
 
-    while (simulation_timer > .1f) {
-      simulation_timer -= .1f;
-      scam_sim.StepSimulation();
+      game_over = false;
+      simulation_timer = 0.f;
+
+      dashboard = std::make_unique<Dashboard>(big_font);
+      scam_sim = std::make_unique<ScamSim>();
+      auto coins = GetAvailableCoins();
+      scam_sim->StartNewCoin(std::move(coins[0]));
+      scam_sim->StepSimulation();
+    }
+
+    if (scam_sim && !game_over) {
+      const auto update_delta_time =
+          static_cast<float>(frame_counter.GetLastDeltaTime() * dashboard->GetSpeedMultiplier());
+      simulation_timer += update_delta_time;
+
+      while (simulation_timer > .1f) {
+        simulation_timer -= .1f;
+        scam_sim->StepSimulation();
+
+        for (const auto& event : scam_sim->GetEvents()) {
+          if (event->day == scam_sim->GetCurrentStep() && event->type == EventType::Audit &&
+              scam_sim->HasBubbleBurst()) {
+            game_over = true;
+          }
+        }
+      }
     }
 
     // Begin frame
@@ -92,10 +119,22 @@ void main_loop(SDL_Window* window) {
       ImGui::End();
     }
 
+    if (game_over) {
+      ImGui::OpenPopup("Game Over");
+
+      if (ImGui::BeginPopupModal("Game Over", nullptr, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize)) {
+        ImGui::Text("Game Over");
+        if (ImGui::Button("Try Again")) {
+          try_again = true;
+        }
+        ImGui::EndPopup();
+      }
+    }
+
     // Dashboard
     {
-      dashboard.ApplySettings(settings);
-      dashboard.Update(scam_sim);
+      dashboard->ApplySettings(settings);
+      dashboard->Update(*scam_sim);
     }
 
     // End frame

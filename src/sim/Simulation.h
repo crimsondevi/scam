@@ -60,6 +60,9 @@ public:
   void AddItem(std::unique_ptr<Item> item);
   void StepSimulation();
 
+  [[nodiscard]] float GetBubbleThreshold() const;
+  [[nodiscard]] bool HasBubbleBurst() const;
+
 private:
   void ProcessTrade();
   void UseItems();
@@ -74,6 +77,7 @@ private:
   int max_items = 5;
   float fake_money = 0.f;
   float real_money = 100.f;
+  float bubble_threshold = .1f;
 
   // current step of the simulation, days by default but does not matter
   int current_step = 0;
