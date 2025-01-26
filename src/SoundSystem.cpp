@@ -40,7 +40,7 @@ void SoundSystem::PlayMusic() {
 
 void SoundSystem::PlaySound(const SoundCue& sound_cue) {
   if (const auto itr = samples.find(sound_cue); itr != samples.cend()) {
-    Mix_PlayChannel(1, itr->second, 1);
+    Mix_PlayChannel(1, itr->second, 0);
   }
 }
 
