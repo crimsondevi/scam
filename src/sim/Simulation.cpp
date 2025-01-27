@@ -31,12 +31,11 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
   items.emplace_back(std::make_unique<Item_DoubleMoney>());
   items.emplace_back(std::make_unique<Item_HalfThreshold>());
   events.emplace_back(std::make_unique<Event>(Event{
-      .day = 50,
+      .day = 100,
       .name = "Shop",
       .type = EventType::Shop,
       .items = std::move(items),
   }));
-
 }
 bool ScamSim::AddTradeOrder(float order) {
   const float new_order = player_actions.trade_wish + order;
@@ -85,7 +84,7 @@ bool ScamSim::HasBubbleBurst() const {
 
 void ScamSim::ProcessTrade() {
   float order = player_actions.trade_wish;
-  coin_state->hype += order;
+  coin_state->hype += order * (order > 0.f ? .5f : 1.f);
 
   fake_money += order;
   real_money += order * coin_state->value * -1.f;
@@ -118,10 +117,20 @@ void ScamSim::ApplyModifiers() {
 }
 
 void ScamSim::UpdateCoin() {
-  coin_state->hype += -.1f;
-  coin_state->volatility = std::lerp(coin_state->volatility, abs(coin_state->hype) + 10.f, .005f);
+  // coin_state->hype += -.1f;
 
-  std::normal_distribution dist(coin_state->hype, coin_state->volatility);
+  if (coin_state->hype > 0.f) {
+    coin_state->hype -= .1f + coin_state->hype / 200.f;
+  } else {
+    // slower decay when hype is negative
+    coin_state->hype -= .1f * (1.f / std::max(1.f, abs(coin_state->hype)));
+  }
+
+  const float volatility_target = coin_state->hype < 0.f ? 20.f : 10.f;
+  coin_state->volatility = std::lerp(coin_state->volatility, volatility_target, .025f);
+  // coin_state->volatility = std::lerp(coin_state->volatility, abs(coin_state->hype) + 10.f, .005f);
+
+  std::normal_distribution dist(coin_state->hype, coin_state->volatility * 2.f);
   coin_state->value_delta = dist(rng);
   coin_state->value += coin_state->value_delta;
   coin_state->value = std::max(0.01f, coin_state->value);
