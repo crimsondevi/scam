@@ -23,7 +23,7 @@ void TextCenter(std::string_view view) {
 namespace Scam {
 
 Dashboard::Dashboard(ImFont* big_font) : big_font(big_font) {
-  window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_NoTabBar;
+  window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
 
   sound_system = std::make_unique<SoundSystem>();
 
@@ -71,11 +71,17 @@ void Dashboard::Update(ScamSim& scam_sim) {
     ImGui::TextCenter(scam_sim.GetCoinState().coin->code);
     ImGui::PopFont();
 
-    std::string real_money_str = std::format("Cash - ${:.2f}", scam_sim.GetRealMoney());
-    ImGui::SeparatorText(real_money_str.c_str());
-    std::string fake_money_str =
-        std::format("{} - {:.2f}", scam_sim.GetCoinState().coin->code, scam_sim.GetFakeMoney());
-    ImGui::SeparatorText(fake_money_str.c_str());
+    {
+      ImGui::SetNextWindowClass(&window_class);
+      ImGui::Begin("Wallet");
+      ImGui::SeparatorText("Wallet");
+      std::string real_money_str = std::format("Cash - ${:.2f}", scam_sim.GetRealMoney());
+      ImGui::Text(real_money_str.c_str());
+      std::string fake_money_str =
+      std::format("{} - {:.2f}", scam_sim.GetCoinState().coin->code, scam_sim.GetFakeMoney());
+      ImGui::Text(fake_money_str.c_str());
+      ImGui::End();
+    }
 
     ImGui::SeparatorText("Market Value");
     ImGui::PushFont(big_font);
@@ -237,7 +243,9 @@ void Dashboard::Update(ScamSim& scam_sim) {
       }
     }
 
-    ImGui::SameLine();
+    ImGui::Text(std::format("Order: {:.0f}", scam_sim.player_actions.trade_wish).c_str());
+
+    // ImGui::SameLine();
 
     // if (ImGui::Button("Dump")) {
     //   sound_system->PlaySound(SoundCue::Purchase);
