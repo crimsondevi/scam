@@ -1,6 +1,5 @@
 #include "Gameloop.h"
 
-#include "Coin.h"
 #include "Dashboard.h"
 #include "FrameCounter.h"
 #include "sim/Simulation.h"
@@ -27,9 +26,12 @@ void main_loop(SDL_Window* window) {
 
   std::unique_ptr<Dashboard> dashboard = std::make_unique<Dashboard>(big_font);
   std::unique_ptr<ScamSim> scam_sim = std::make_unique<ScamSim>();
-  auto coins = GetAvailableCoins();
-  scam_sim->StartNewCoin(std::move(coins[0]));
-  scam_sim->StepSimulation();
+
+  {
+    auto coins = GetAvailableCoins();
+    scam_sim->StartNewCoin(std::move(coins[0]));
+    scam_sim->StepSimulation();
+  }
 
   float simulation_timer = 0.f;
   bool game_over = false;
@@ -60,9 +62,12 @@ void main_loop(SDL_Window* window) {
 
       dashboard = std::make_unique<Dashboard>(big_font);
       scam_sim = std::make_unique<ScamSim>();
-      auto coins = GetAvailableCoins();
-      scam_sim->StartNewCoin(std::move(coins[0]));
-      scam_sim->StepSimulation();
+
+      {
+        auto coins = GetAvailableCoins();
+        scam_sim->StartNewCoin(std::move(coins[0]));
+        scam_sim->StepSimulation();
+      }
     }
 
     if (scam_sim && !game_over) {
@@ -134,7 +139,7 @@ void main_loop(SDL_Window* window) {
     // Dashboard
     {
       dashboard->ApplySettings(settings);
-      dashboard->Update(*scam_sim);
+      dashboard->Update(static_cast<float>(frame_counter.GetLastDeltaTime()), *scam_sim);
     }
 
     // End frame

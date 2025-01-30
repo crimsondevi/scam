@@ -22,8 +22,6 @@ set(SCAM_SRC
         src/FrameCounter.h
         src/Dashboard.cpp
         src/Dashboard.h
-        src/Coin.cpp
-        src/Coin.h
         src/SoundSystem.cpp
         src/SoundSystem.h
         src/sim/Item.cpp

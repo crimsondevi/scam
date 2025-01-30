@@ -27,12 +27,12 @@ Dashboard::Dashboard(ImFont* big_font) : big_font(big_font) {
 
   sound_system = std::make_unique<SoundSystem>();
 
-  sound_system->PlayMusic();
+  //  sound_system->PlayMusic();
 
   test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "coin.png");
 }
 
-void Dashboard::Update(ScamSim& scam_sim) {
+void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
   ImGuiID dockspace_id = ImGui::DockSpaceOverViewport();
 
   static bool init = false;
@@ -43,13 +43,18 @@ void Dashboard::Update(ScamSim& scam_sim) {
     ImGui::DockBuilderRemoveNodeChildNodes(dockspace_id);
 
     ImGuiID dock_id_up, dock_id_bottom;
-    ImGuiID dock_id_up_left, dock_id_up_right;
     ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, .75f, &dock_id_up, &dock_id_bottom);
+
+    ImGuiID dock_id_up_left, dock_id_up_right;
     ImGui::DockBuilderSplitNode(dock_id_up, ImGuiDir_Left, .2f, &dock_id_up_left, &dock_id_up_right);
+
+    ImGuiID dock_id_bottom_left, dock_id_bottom_right;
+    ImGui::DockBuilderSplitNode(dock_id_bottom, ImGuiDir_Left, .2f, &dock_id_bottom_left, &dock_id_bottom_right);
 
     ImGui::DockBuilderDockWindow("Status", dock_id_up_left);
     ImGui::DockBuilderDockWindow("Market", dock_id_up_right);
-    ImGui::DockBuilderDockWindow("Action", dock_id_bottom);
+    ImGui::DockBuilderDockWindow("Wallet", dock_id_bottom_left);
+    ImGui::DockBuilderDockWindow("Action", dock_id_bottom_right);
 
     ImGui::DockBuilderFinish(dockspace_id);
   }
@@ -75,11 +80,8 @@ void Dashboard::Update(ScamSim& scam_sim) {
       ImGui::SetNextWindowClass(&window_class);
       ImGui::Begin("Wallet");
       ImGui::SeparatorText("Wallet");
-      std::string real_money_str = std::format("Cash - ${:.2f}", scam_sim.GetRealMoney());
-      ImGui::Text(real_money_str.c_str());
-      std::string fake_money_str =
-      std::format("{} - {:.2f}", scam_sim.GetCoinState().coin->code, scam_sim.GetFakeMoney());
-      ImGui::Text(fake_money_str.c_str());
+      ImGui::Text("Cash - $%.2f", scam_sim.real_money);
+      ImGui::Text("%s - %.2f", scam_sim.GetCoinState().coin->code.c_str(), scam_sim.GetFakeMoney());
       ImGui::End();
     }
 
@@ -171,8 +173,8 @@ void Dashboard::Update(ScamSim& scam_sim) {
     if (ImPlot::BeginPlot("Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
       float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
       float x_max = x_data.back() + 365.f / 2.f;
-      float y_min = std::max(scam_sim.GetCoinState().value - 2000.f, -20.f);
-      float y_max = *std::max_element(y_data.begin() + std::max(y_data.size()-200.f, 0.f), y_data.end()) + 500.f;
+      float y_min = std::min(std::max(scam_sim.GetCoinState().value - 2000.f, -20.f), scam_sim.GetBubbleThreshold());
+      float y_max = *std::max_element(y_data.begin() + std::max(y_data.size() - 200.f, 0.f), y_data.end()) + 500.f;
       ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_Opposite);
       if (speed_multiplier > 0) {
         ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
@@ -229,21 +231,46 @@ void Dashboard::Update(ScamSim& scam_sim) {
     ImGui::BeginGroup();
     ImGui::PushFont(big_font);
 
-    if (ImGui::Button("Buy", {200.f, 100.f})) {
-      if (scam_sim.AddTradeOrder(1.f)) {
-        sound_system->PlaySound(SoundCue::Click);
+    const auto buy_button_label = std::format("Buy {}x", combo_action == Action::Buy ? combo_multiplier : 1);
+    if (ImGui::Button(buy_button_label.c_str(), {200.f, 100.f})) {
+      if (combo_action != Action::Buy) {
+        combo_multiplier = 1;
+      }
+
+      if (scam_sim.AddTradeOrder(1.f * static_cast<float>(combo_multiplier))) {
+        sound_system->PlaySound(SoundCue::Purchase);
+
+        combo_multiplier += 1;
+        combo_action = Action::Buy;
+        combo_timer = combo_timer_reset_threshold;
       }
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Sell", {200.f, 100.f})) {
-      if (scam_sim.AddTradeOrder(-1.f)) {
+    const auto sell_button_label = std::format("Sell {}x", combo_action == Action::Sell ? combo_multiplier : 1);
+    if (ImGui::Button(sell_button_label.c_str(), {200.f, 100.f})) {
+      if (combo_action != Action::Sell) {
+        combo_multiplier = 1;
+      }
+
+      if (scam_sim.AddTradeOrder(-1.f * static_cast<float>(combo_multiplier))) {
         sound_system->PlaySound(SoundCue::Click);
+
+        combo_multiplier += 1;
+        combo_action = Action::Sell;
+        combo_timer = combo_timer_reset_threshold;
       }
     }
 
-    ImGui::Text(std::format("Order: {:.0f}", scam_sim.player_actions.trade_wish).c_str());
+    combo_timer -= delta_time;
+
+    if (combo_timer <= 0.f) {
+      combo_timer = 0.f;
+      combo_multiplier = 1;
+    }
+
+    ImGui::Text("Trade: %d", scam_sim.player_actions.trade_wish);
 
     // ImGui::SameLine();
 

@@ -21,7 +21,7 @@ struct CoinState {
 };
 
 struct PlayerActions {
-  float trade_wish = 0.f;
+  int trade_wish = 0;
 };
 
 class ScamSim {
@@ -44,7 +44,7 @@ public:
   int GetMaxItems() const {
     return max_items;
   }
-  [[nodiscard]] int GetCurrentStep() const {
+  [[nodiscard]] uint32_t GetCurrentStep() const {
     return current_step;
   }
   float GetRealMoney() const {

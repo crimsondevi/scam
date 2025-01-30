@@ -9,12 +9,18 @@
 
 namespace Scam {
 
+enum class Action {
+  None,
+  Buy,
+  Sell
+};
+
 class Dashboard {
 public:
   Dashboard(ImFont* big_font);
 
 public:
-  void Update(ScamSim& scam_sim);
+  void Update(float delta_time, ScamSim& scam_sim);
 
 public:
   void ApplySettings(const Settings& settings);
@@ -40,6 +46,11 @@ private:
 
   Event* current_event = nullptr;
   int pre_event_speed_multiplier = 1;
+
+  int combo_multiplier = 1;
+  Action combo_action = Action::None;
+  float combo_timer = 0.f;
+  float combo_timer_reset_threshold = 1.f;
 };
 
 } // namespace Scam
