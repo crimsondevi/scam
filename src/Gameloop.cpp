@@ -47,9 +47,32 @@ void main_loop(SDL_Window* window) {
       if (e.type == SDL_EVENT_QUIT) {
         quit = true;
       }
+
       if (e.type == SDL_EVENT_KEY_DOWN) {
         if (e.key.key == SDLK_ESCAPE) {
           quit = true;
+        }
+
+        static int last_speed_multiplier = 1;
+
+        switch (e.key.key) {
+        case SDLK_1:
+          dashboard->SetSpeedMultiplier(1);
+          break;
+        case SDLK_2:
+          dashboard->SetSpeedMultiplier(4);
+          break;
+        case SDLK_3:
+          dashboard->SetSpeedMultiplier(16);
+          break;
+        case SDLK_SPACE:
+          if (dashboard->GetSpeedMultiplier() > 0) {
+            last_speed_multiplier = dashboard->GetSpeedMultiplier();
+            dashboard->SetSpeedMultiplier(0);
+          } else {
+            dashboard->SetSpeedMultiplier(last_speed_multiplier);
+          }
+          break;
         }
       }
     }

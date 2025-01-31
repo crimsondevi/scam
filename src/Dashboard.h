@@ -17,7 +17,7 @@ enum class Action {
 
 class Dashboard {
 public:
-  Dashboard(ImFont* big_font);
+  explicit Dashboard(ImFont* big_font);
 
 public:
   void Update(float delta_time, ScamSim& scam_sim);
@@ -27,6 +27,7 @@ public:
 
 public:
   [[nodiscard]] int GetSpeedMultiplier() const;
+  void SetSpeedMultiplier(int in_speed_multiplier);
 
 private:
   ImFont* big_font = nullptr;

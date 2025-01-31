@@ -77,7 +77,9 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
     ImGui::SeparatorText("Market Value");
     ImGui::PushFont(big_font);
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 0.f, 1.f));
     ImGui::TextCenter(std::format("${:.2f}", scam_sim.GetCoinState().value));
+    ImGui::PopStyleColor();
     ImGui::PopFont();
     ImGui::TextCenter(std::format("Trend: {:+.4f}", scam_sim.GetCoinState().value_delta));
 
@@ -192,31 +194,48 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
                              static_cast<float>(scam_sim.GetBubbleThreshold()));
       const uint32_t offset = std::max(static_cast<int>(y_data.size()) - 200, 0);
       float y_max = *std::max_element(y_data.begin() + offset, y_data.end()) + 500.f;
-      ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_Opposite);
+      ImPlot::SetupAxes(
+          "Day", "Stonks", ImPlotAxisFlags_NoHighlight, ImPlotAxisFlags_Opposite | ImPlotAxisFlags_NoHighlight);
       if (speed_multiplier > 0) {
         ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
         ImPlot::SetupAxisLimits(ImAxis_Y1, y_min, y_max, ImGuiCond_Always);
       }
-      ImPlot::SetNextLineStyle(ImVec4(.6f, .4f, .1f, 1.f), 2.f);
-      ImPlot::PlotLine("BUBL", x_data.data(), y_data.data(), (int)x_data.size());
-      ImPlot::SetNextLineStyle(ImVec4(1.f, 1.f, 1.f, 1.f), 2.f);
-      ImPlot::PlotInfLines("##Today", &x_data.back(), 1);
-      ImPlot::PlotText("Today", x_data.back(), 0.f, ImVec2(16.f, -80.f), ImPlotTextFlags_Vertical);
+
+      // Draw bubble threshold
 
       const double bubble_threshold = scam_sim.GetBubbleThreshold();
+      ImPlot::SetNextLineStyle(ImVec4(1.f, 0.f, 0.f, 1.f), 2.f);
       ImPlot::PlotInfLines("##Bubble Threshold", &bubble_threshold, 1, ImPlotInfLinesFlags_Horizontal);
       ImPlot::PlotText("Bubble Threshold", x_data.back(), bubble_threshold, ImVec2(0.f, 16.f));
+
+      // Draw events
 
       for (const auto& event : scam_sim.GetEvents()) {
         const auto day = static_cast<float>(event->day);
         if (day >= x_min && day <= x_max) {
           const std::string day_name = std::format("##event_day_{}", event->day);
-          auto line_color = event->type == EventType::Audit ? ImVec4(1.f, 0.f, 0.f, 1.f) : ImVec4(0.f, 1.f, 0.f, 1.f);
+          auto line_color = event->type == EventType::Audit ? ImVec4(1.f, 0.f, 1.f, 1.f) : ImVec4(0.f, 1.f, 0.f, 1.f);
           ImPlot::SetNextLineStyle(line_color, 2.f);
           ImPlot::PlotInfLines(day_name.c_str(), &day, 1);
           ImPlot::PlotText(event->name.c_str(), day, 0.f, ImVec2(16.f, 0.f), ImPlotTextFlags_Vertical);
         }
       }
+
+      // Draw stonks
+
+      ImPlot::SetNextLineStyle(ImVec4(.8f, .6f, .1f, 1.f), 2.f);
+      ImPlot::SetNextFillStyle(ImVec4(.8f, .6f, .1f, .2f));
+      ImPlot::PlotLine(scam_sim.GetCoinState().coin->code.c_str(),
+                       x_data.data(),
+                       y_data.data(),
+                       (int)x_data.size(),
+                       ImPlotLineFlags_Shaded);
+      ImPlot::SetNextLineStyle(ImVec4(1.f, 1.f, 1.f, 1.f), 2.f);
+      ImPlot::PlotInfLines("##Today", &x_data.back(), 1);
+      ImPlot::PlotText("Today", x_data.back(), 0.f, ImVec2(16.f, -80.f), ImPlotTextFlags_Vertical);
+      ImPlot::SetNextMarkerStyle(
+          ImPlotMarker_Circle, 10.f, ImVec4(.8f, .6f, .1f, 1.f), 2.f, ImVec4(1.f, 1.f, 1.f, 1.f));
+      ImPlot::PlotScatter("##Coin", x_data.data() + (x_data.size() - 1), y_data.data() + (x_data.size() - 1), 1);
 
       ImPlot::EndPlot();
     }
@@ -324,6 +343,10 @@ void Dashboard::ApplySettings(const Settings& settings) {
 
 int Dashboard::GetSpeedMultiplier() const {
   return speed_multiplier;
+}
+
+void Dashboard::SetSpeedMultiplier(int in_speed_multiplier) {
+  speed_multiplier = in_speed_multiplier;
 }
 
 } // namespace Scam
