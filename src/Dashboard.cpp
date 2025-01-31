@@ -7,7 +7,6 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <implot.h>
-#include <implot_internal.h>
 #include <vector>
 
 namespace ImGui {
@@ -76,15 +75,6 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::TextCenter(scam_sim.GetCoinState().coin->code);
     ImGui::PopFont();
 
-    {
-      ImGui::SetNextWindowClass(&window_class);
-      ImGui::Begin("Wallet");
-      ImGui::SeparatorText("Wallet");
-      ImGui::Text("Cash - $%.2f", scam_sim.real_money);
-      ImGui::Text("%s - %.2f", scam_sim.GetCoinState().coin->code.c_str(), scam_sim.GetFakeMoney());
-      ImGui::End();
-    }
-
     ImGui::SeparatorText("Market Value");
     ImGui::PushFont(big_font);
     ImGui::TextCenter(std::format("${:.2f}", scam_sim.GetCoinState().value));
@@ -100,6 +90,16 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::SliderFloat("##Volatility", &volatility, 0.f, 10.f, "%.2f", ImGuiSliderFlags_ReadOnly);
 
     ImGui::PopItemWidth();
+    ImGui::End();
+  }
+
+  // Wallet window
+  {
+    ImGui::SetNextWindowClass(&window_class);
+    ImGui::Begin("Wallet");
+    ImGui::SeparatorText("Wallet");
+    ImGui::Text("Cash: $%.2f", scam_sim.GetRealMoney());
+    ImGui::Text("%s: %.2f", scam_sim.GetCoinState().coin->code.c_str(), scam_sim.GetFakeMoney());
     ImGui::End();
   }
 
@@ -133,17 +133,22 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
       bool bought = false;
       size_t chosen_item_index = -1;
 
+      ImGui::BeginTable("Test", 4, ImGuiTableFlags_None, ImVec2(-1.f, -1.f));
+
       for (int i = 0; i < current_event->items.size(); i++) {
+        ImGui::TableNextColumn();
+
         const auto& item = *current_event->items[i];
 
-        const std::string item_label = std::format("Buy##{}", i);
+        const std::string item_label = std::format("Choose##{}", i);
 
         ImGui::BeginGroup();
         if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
-          ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, ImVec2(64.f, 64.f));
+          ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, ImVec2(192.f, 192.f));
         }
         ImGui::Text("%s", item.GetInterfaceData().name.c_str());
-        if (ImGui::Button(item_label.c_str())) {
+
+        if (ImGui::Button(item_label.c_str(), ImVec2(192.f, 48.f))) {
           chosen_item_index = i;
           bought = true;
         }
@@ -155,14 +160,24 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
             ImGui::EndTooltip();
           }
         }
+
+        if (i != current_event->items.size() - 1) {
+          ImGui::SameLine();
+          ImGui::Spacing();
+          ImGui::SameLine();
+        }
       }
+
+      ImGui::EndTable();
+
+      ImGui::End();
+
       if (bought) {
         auto item = std::move(current_event->items.at(chosen_item_index));
         scam_sim.AddItem(std::move(item));
         current_event = nullptr;
         speed_multiplier = pre_event_speed_multiplier;
       }
-      ImGui::End();
     }
   }
 
@@ -173,8 +188,10 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     if (ImPlot::BeginPlot("Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
       float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
       float x_max = x_data.back() + 365.f / 2.f;
-      float y_min = std::min(std::max(scam_sim.GetCoinState().value - 2000.f, -20.f), scam_sim.GetBubbleThreshold());
-      float y_max = *std::max_element(y_data.begin() + std::max(y_data.size() - 200.f, 0.f), y_data.end()) + 500.f;
+      float y_min = std::min(std::max(scam_sim.GetCoinState().value - 2000.f, -20.f),
+                             static_cast<float>(scam_sim.GetBubbleThreshold()));
+      const uint32_t offset = std::max(static_cast<int>(y_data.size()) - 200, 0);
+      float y_max = *std::max_element(y_data.begin() + offset, y_data.end()) + 500.f;
       ImPlot::SetupAxes("Day", "Stonks", ImPlotAxisFlags_None, ImPlotAxisFlags_Opposite);
       if (speed_multiplier > 0) {
         ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
@@ -186,14 +203,14 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
       ImPlot::PlotInfLines("##Today", &x_data.back(), 1);
       ImPlot::PlotText("Today", x_data.back(), 0.f, ImVec2(16.f, -80.f), ImPlotTextFlags_Vertical);
 
-      const float bubble_threshold = scam_sim.GetBubbleThreshold();
+      const double bubble_threshold = scam_sim.GetBubbleThreshold();
       ImPlot::PlotInfLines("##Bubble Threshold", &bubble_threshold, 1, ImPlotInfLinesFlags_Horizontal);
       ImPlot::PlotText("Bubble Threshold", x_data.back(), bubble_threshold, ImVec2(0.f, 16.f));
 
       for (const auto& event : scam_sim.GetEvents()) {
-        if (event->day >= x_min && event->day <= x_max) {
+        const auto day = static_cast<float>(event->day);
+        if (day >= x_min && day <= x_max) {
           const std::string day_name = std::format("##event_day_{}", event->day);
-          const auto day = static_cast<float>(event->day);
           auto line_color = event->type == EventType::Audit ? ImVec4(1.f, 0.f, 0.f, 1.f) : ImVec4(0.f, 1.f, 0.f, 1.f);
           ImPlot::SetNextLineStyle(line_color, 2.f);
           ImPlot::PlotInfLines(day_name.c_str(), &day, 1);
@@ -229,6 +246,24 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::SetCursorPosY((ImGui::GetContentRegionAvail().y - button_group_size.y) / 2.f);
 
     ImGui::BeginGroup();
+
+    ImGui::PushItemWidth(button_group_size.x);
+    int trade_wish = scam_sim.GetTradeWish();
+    ImGui::SliderInt("##Trade Wish", &trade_wish, -30, 30, "%d", ImGuiSliderFlags_ReadOnly);
+
+    int trade = scam_sim.GetProcessedTrades();
+    const auto [max_buy_orders, max_sell_orders] = scam_sim.GetMaxBuySellOrders();
+    ImGui::PushStyleColor(ImGuiCol_Border, trade > 0 ? ImVec4(0.f, 1.f, 0.f, 1.f) : ImVec4(1.f, 0.f, 0.f, 1.f));
+    ImGui::SliderInt("##Trade",
+                     &trade,
+                     -static_cast<int>(max_sell_orders),
+                     static_cast<int>(max_buy_orders),
+                     "%d",
+                     ImGuiSliderFlags_ReadOnly);
+    ImGui::PopStyleColor();
+    ImGui::PopItemWidth();
+
+    ImGui::BeginGroup();
     ImGui::PushFont(big_font);
 
     const auto buy_button_label = std::format("Buy {}x", combo_action == Action::Buy ? combo_multiplier : 1);
@@ -237,7 +272,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
         combo_multiplier = 1;
       }
 
-      if (scam_sim.AddTradeOrder(1.f * static_cast<float>(combo_multiplier))) {
+      if (scam_sim.AddTradeOrder(combo_multiplier)) {
         sound_system->PlaySound(SoundCue::Purchase);
 
         combo_multiplier += 1;
@@ -254,7 +289,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
         combo_multiplier = 1;
       }
 
-      if (scam_sim.AddTradeOrder(-1.f * static_cast<float>(combo_multiplier))) {
+      if (scam_sim.AddTradeOrder(-combo_multiplier)) {
         sound_system->PlaySound(SoundCue::Click);
 
         combo_multiplier += 1;
@@ -270,18 +305,13 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
       combo_multiplier = 1;
     }
 
-    ImGui::Text("Trade: %d", scam_sim.player_actions.trade_wish);
-
-    // ImGui::SameLine();
-
-    // if (ImGui::Button("Dump")) {
-    //   sound_system->PlaySound(SoundCue::Purchase);
-    // }
-
     ImGui::PopFont();
+
     ImGui::EndGroup();
 
     button_group_size = ImGui::GetItemRectSize();
+
+    ImGui::EndGroup();
 
     ImGui::End();
   }

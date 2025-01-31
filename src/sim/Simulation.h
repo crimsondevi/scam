@@ -29,38 +29,49 @@ public:
   ScamSim();
 
 public:
-  const CoinState& GetCoinState() const {
+  [[nodiscard]] const CoinState& GetCoinState() const {
     return *coin_state;
   }
-  const std::vector<std::unique_ptr<Modifier>>& GetModifiers() const {
+
+  [[nodiscard]] const std::vector<std::unique_ptr<Modifier>>& GetModifiers() const {
     return modifiers;
   }
-  const std::vector<std::unique_ptr<Item>>& GetItems() const {
+
+  [[nodiscard]] const std::vector<std::unique_ptr<Item>>& GetItems() const {
     return items;
   }
-  const std::vector<std::unique_ptr<Event>>& GetEvents() const {
+
+  [[nodiscard]] const std::vector<std::unique_ptr<Event>>& GetEvents() const {
     return events;
   }
-  int GetMaxItems() const {
+
+  [[nodiscard]] int GetMaxItems() const {
     return max_items;
   }
+
   [[nodiscard]] uint32_t GetCurrentStep() const {
     return current_step;
   }
-  float GetRealMoney() const {
+
+  [[nodiscard]] double GetRealMoney() const {
     return real_money;
   }
-  float GetFakeMoney() const {
+
+  [[nodiscard]] double GetFakeMoney() const {
     return fake_money;
   }
 
   void StartNewCoin(std::unique_ptr<ScamCoin> new_coin);
-  bool AddTradeOrder(float order);
+  bool AddTradeOrder(int order);
   void AddModifier(std::unique_ptr<Modifier> modifier);
   void AddItem(std::unique_ptr<Item> item);
   void StepSimulation();
 
-  [[nodiscard]] float GetBubbleThreshold() const;
+  [[nodiscard]] int GetTradeWish() const;
+  [[nodiscard]] int GetProcessedTrades() const;
+  [[nodiscard]] std::pair<double, double> GetMaxBuySell() const;
+  [[nodiscard]] std::pair<double, double> GetMaxBuySellOrders() const;
+  [[nodiscard]] double GetBubbleThreshold() const;
   [[nodiscard]] bool HasBubbleBurst() const;
 
 private:
@@ -69,7 +80,7 @@ private:
   void ApplyModifiers();
   void UpdateCoin();
 
-public:
+private:
   PlayerActions player_actions;
   std::unique_ptr<CoinState> coin_state;
   std::vector<std::unique_ptr<Modifier>> modifiers;
@@ -77,14 +88,20 @@ public:
   std::vector<std::unique_ptr<Event>> events;
 
   int max_items = 5;
-  float fake_money = 0.f;
-  float real_money = 100.f;
-  float bubble_threshold = .1f;
+  double fake_money = 0.0;
+  double real_money = 100.0;
+  double bubble_threshold = .1f;
+  int processed_trades = 0;
 
   // current step of the simulation, days by default but does not matter
   int current_step = 0;
 
   std::mt19937 rng;
+
+private:
+  friend class Item;
+  friend class Item_DoubleMoney;
+  friend class Item_HalfThreshold;
 };
 
 } // namespace Scam

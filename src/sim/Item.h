@@ -41,7 +41,7 @@ public:
 };
 
 class Item_DoubleMoney : public Item {
-  public:
+public:
   ScamInterfaceData GetInterfaceData() const override;
   void ApplyItem(ScamSim& sim) override;
 };

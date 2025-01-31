@@ -14,7 +14,7 @@ namespace Scam {
 ScamSim::ScamSim() {
   SDL_Time time;
   SDL_GetCurrentTime(&time);
-  std::default_random_engine generator(time);
+  std::default_random_engine generator(static_cast<uint32_t>(time));
   rng = std::mt19937(generator());
 }
 
@@ -25,27 +25,27 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
   // initial hype modifier
   AddModifier(std::make_unique<Modifier_SlowHype>());
 
-  auto items = std::vector<std::unique_ptr<Item>>();
-  items.emplace_back(std::make_unique<Item_HypeCampaign>());
-  items.emplace_back(std::make_unique<Item_CrazyCampaign>());
-  items.emplace_back(std::make_unique<Item_DoubleMoney>());
-  items.emplace_back(std::make_unique<Item_HalfThreshold>());
+  auto shop_items = std::vector<std::unique_ptr<Item>>();
+  shop_items.emplace_back(std::make_unique<Item_HypeCampaign>());
+  shop_items.emplace_back(std::make_unique<Item_CrazyCampaign>());
+  shop_items.emplace_back(std::make_unique<Item_DoubleMoney>());
+  shop_items.emplace_back(std::make_unique<Item_HalfThreshold>());
   events.emplace_back(std::make_unique<Event>(Event{
       .day = 100,
       .name = "Shop",
       .type = EventType::Shop,
-      .items = std::move(items),
+      .items = std::move(shop_items),
   }));
 }
 
-bool ScamSim::AddTradeOrder(float order) {
-  const int max_buy = std::floor(real_money / coin_state->value);
-  const int max_sell = std::floor(fake_money);
-  if (order > max_buy || order < -max_sell) {
+bool ScamSim::AddTradeOrder(int order) {
+  const auto [max_buys, max_sells] = GetMaxBuySell();
+
+  if (order > max_buys || order < -max_sells) {
     return false;
   }
 
-  if (player_actions.trade_wish < 0.f && order > 0.f || player_actions.trade_wish > 0.f && order < 0.f) {
+  if (player_actions.trade_wish < 0 && order > 0 || player_actions.trade_wish > 0 && order < 0) {
     player_actions.trade_wish = order;
   } else {
     player_actions.trade_wish += order;
@@ -72,7 +72,24 @@ void ScamSim::StepSimulation() {
   current_step++;
 }
 
-float ScamSim::GetBubbleThreshold() const {
+int ScamSim::GetTradeWish() const {
+  return player_actions.trade_wish;
+}
+
+int ScamSim::GetProcessedTrades() const {
+  return processed_trades;
+}
+
+std::pair<double, double> ScamSim::GetMaxBuySell() const {
+  return std::make_pair(std::floor(real_money / coin_state->value), std::floor(fake_money));
+}
+
+std::pair<double, double> ScamSim::GetMaxBuySellOrders() const {
+  return std::make_pair(std::max(1.0, static_cast<double>(std::floor(std::log(current_step)))),
+                        std::max(1.0, static_cast<double>(std::floor(std::log(current_step)))));
+}
+
+double ScamSim::GetBubbleThreshold() const {
   return bubble_threshold;
 }
 
@@ -81,25 +98,26 @@ bool ScamSim::HasBubbleBurst() const {
 }
 
 void ScamSim::ProcessTrade() {
-  const int orders = player_actions.trade_wish;
+  const double orders = player_actions.trade_wish;
 
-  const int max_buy = std::floor(real_money / coin_state->value);
-  const int max_sell = std::floor(fake_money);
+  const auto [max_buys, max_sells] = GetMaxBuySell();
+  const auto [max_buy_orders, max_sell_orders] = GetMaxBuySellOrders();
 
-  const int max_buy_orders = std::min(4, max_buy);
-  const int max_sell_orders = std::min(4, max_sell);
+  const double min_orders = std::max(-max_sell_orders, -max_sells);
+  const double max_orders = std::min(max_buy_orders, max_buys);
+  const double clamped_orders = std::clamp(orders, min_orders, max_orders);
 
-  const int clamped_orders = orders < 0 ? std::max(-max_sell_orders, orders) : std::min(max_buy_orders, orders);
-
-  coin_state->hype += static_cast<float>(clamped_orders) * (clamped_orders > 0 ? .1f : .25f);
+  coin_state->hype += static_cast<float>(clamped_orders) * (clamped_orders > 0 ? .15f : .25f);
 
   fake_money += static_cast<float>(clamped_orders);
   real_money -= static_cast<float>(clamped_orders) * coin_state->value;
 
   if (std::abs(player_actions.trade_wish) > 0 && std::abs(clamped_orders) == 0) {
-    player_actions.trade_wish /= 2;
+    processed_trades = 0;
+    player_actions.trade_wish = 0;
   } else {
-    player_actions.trade_wish -= clamped_orders;
+    processed_trades = static_cast<int>(clamped_orders);
+    player_actions.trade_wish -= processed_trades;
   }
 }
 
@@ -156,16 +174,16 @@ void ScamSim::UpdateCoin() {
   }
 
   if ((current_step + 200) % 400 == 0) {
-    auto items = std::vector<std::unique_ptr<Item>>();
-    items.emplace_back(std::make_unique<Item_HypeCampaign>());
-    items.emplace_back(std::make_unique<Item_CrazyCampaign>());
-    items.emplace_back(std::make_unique<Item_DoubleMoney>());
-    items.emplace_back(std::make_unique<Item_HalfThreshold>());
+    auto shop_items = std::vector<std::unique_ptr<Item>>();
+    shop_items.emplace_back(std::make_unique<Item_HypeCampaign>());
+    shop_items.emplace_back(std::make_unique<Item_CrazyCampaign>());
+    shop_items.emplace_back(std::make_unique<Item_DoubleMoney>());
+    shop_items.emplace_back(std::make_unique<Item_HalfThreshold>());
     events.emplace_back(std::make_unique<Event>(Event{
         .day = current_step + 200,
         .name = "Shop",
         .type = EventType::Shop,
-        .items = std::move(items),
+        .items = std::move(shop_items),
     }));
   }
 }

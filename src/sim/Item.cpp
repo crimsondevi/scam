@@ -40,6 +40,7 @@ ScamInterfaceData Item_CrazyCampaign::GetInterfaceData() const {
 void Item_CrazyCampaign::ApplyItem(ScamSim& sim) {
   sim.AddModifier(std::make_unique<Modifier_CrazyMarket>());
 }
+
 ScamInterfaceData Item_DoubleMoney::GetInterfaceData() const {
   return {"Double Money", "Start a campaign to copy every dollar bill you have!"};
 }
