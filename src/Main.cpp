@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
   // Big font
   {
     ImFontConfig font_cfg;
-    font_cfg.SizePixels = 72.f;
+    font_cfg.SizePixels = 54.f;
     const auto font_path = std::filesystem::current_path() / "data" / "m6x11plus.ttf";
     io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), font_cfg.SizePixels, &font_cfg);
 
