@@ -56,20 +56,49 @@ int main(int argc, char* argv[]) {
   io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
   io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-  ImFontConfig font_cfg;
-  font_cfg.SizePixels = 26.f;
-  io.Fonts->AddFontDefault(&font_cfg);
+  // Default font
+  {
+    ImFontConfig font_cfg;
+    font_cfg.SizePixels = 24.f;
+    const auto font_path = std::filesystem::current_path() / "data" / "m6x11.ttf";
+    io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), font_cfg.SizePixels, &font_cfg);
 
-  float base_font_size = font_cfg.SizePixels;
-  float icon_font_size = base_font_size * 2.f / 3.f; // FontAwesome fonts need to have their sizes reduced
+    // Font awesome icon font
+    {
+      const float base_font_size = font_cfg.SizePixels;
+      const float icon_font_size = base_font_size; // FontAwesome fonts need to have their sizes reduced
 
-  static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-  ImFontConfig icons_config;
-  icons_config.MergeMode = true;
-  icons_config.PixelSnapH = true;
-  icons_config.GlyphMinAdvanceX = icon_font_size;
-  const auto path = std::filesystem::current_path() / "data" / FONT_ICON_FILE_NAME_FAS;
-  io.Fonts->AddFontFromFileTTF(path.string().c_str(), icon_font_size, &icons_config, icons_ranges);
+      static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+      ImFontConfig icons_config;
+      icons_config.MergeMode = true;
+      icons_config.PixelSnapH = true;
+      icons_config.GlyphMinAdvanceX = icon_font_size;
+      const auto fa_path = std::filesystem::current_path() / "data" / FONT_ICON_FILE_NAME_FAS;
+      io.Fonts->AddFontFromFileTTF(fa_path.string().c_str(), icon_font_size, &icons_config, icons_ranges);
+    }
+  }
+
+  // Big font
+  {
+    ImFontConfig font_cfg;
+    font_cfg.SizePixels = 48.f;
+    const auto font_path = std::filesystem::current_path() / "data" / "m6x11.ttf";
+    io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), font_cfg.SizePixels, &font_cfg);
+
+    // Font awesome icon font
+    {
+      const float base_font_size = font_cfg.SizePixels;
+      const float icon_font_size = base_font_size; // FontAwesome fonts need to have their sizes reduced
+
+      static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+      ImFontConfig icons_config;
+      icons_config.MergeMode = true;
+      icons_config.PixelSnapH = true;
+      icons_config.GlyphMinAdvanceX = icon_font_size;
+      const auto fa_path = std::filesystem::current_path() / "data" / FONT_ICON_FILE_NAME_FAS;
+      io.Fonts->AddFontFromFileTTF(fa_path.string().c_str(), icon_font_size, &icons_config, icons_ranges);
+    }
+  }
 
   ImPlot::CreateContext();
 

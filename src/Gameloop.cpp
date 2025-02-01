@@ -4,7 +4,6 @@
 #include "FrameCounter.h"
 #include "sim/Simulation.h"
 
-#include <IconsFontAwesome6.h>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
@@ -15,28 +14,12 @@
 namespace Scam {
 
 void main_loop(SDL_Window* window) {
-  const ImGuiIO& io = ImGui::GetIO();
-  ImFontConfig font_cfg;
-  font_cfg.SizePixels = 39.f;
-  auto big_font = io.Fonts->AddFontDefault(&font_cfg);
-
-  float base_font_size = font_cfg.SizePixels;
-  float icon_font_size = base_font_size * 2.f / 3.f; // FontAwesome fonts need to have their sizes reduced
-
-  static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
-  ImFontConfig icons_config;
-  icons_config.MergeMode = true;
-  icons_config.PixelSnapH = true;
-  icons_config.GlyphMinAdvanceX = icon_font_size;
-  const auto path = std::filesystem::current_path() / "data" / FONT_ICON_FILE_NAME_FAS;
-  io.Fonts->AddFontFromFileTTF(path.string().c_str(), icon_font_size, &icons_config, icons_ranges);
-
   FrameCounter frame_counter;
   bool show_settings_panel = false;
   Settings settings;
   bool quit = false;
 
-  std::unique_ptr<Dashboard> dashboard = std::make_unique<Dashboard>(settings, big_font);
+  std::unique_ptr<Dashboard> dashboard = std::make_unique<Dashboard>(settings);
   std::unique_ptr<ScamSim> scam_sim = std::make_unique<ScamSim>();
 
   {
@@ -95,7 +78,7 @@ void main_loop(SDL_Window* window) {
       game_over = false;
       simulation_timer = 0.f;
 
-      dashboard = std::make_unique<Dashboard>(settings, big_font);
+      dashboard = std::make_unique<Dashboard>(settings);
       scam_sim = std::make_unique<ScamSim>();
 
       {

@@ -13,8 +13,8 @@
 namespace ImGui {
 
 void TextCenter(std::string_view view) {
-  float font_size = ImGui::GetFontSize() * static_cast<float>(view.size()) / 2.f;
-  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2 - font_size + (font_size / 2));
+  ImVec2 size = ImGui::CalcTextSize(view.data(), nullptr, true);
+  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2 - (size.x / 2));
   ImGui::Text("%s", view.data());
 }
 
@@ -22,7 +22,9 @@ void TextCenter(std::string_view view) {
 
 namespace Scam {
 
-Dashboard::Dashboard(const Settings& settings, ImFont* big_font) : big_font(big_font) {
+Dashboard::Dashboard(const Settings& settings) {
+  big_font = ImGui::GetIO().Fonts->Fonts[1];
+
   window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
 
   sound_system = std::make_unique<SoundSystem>();

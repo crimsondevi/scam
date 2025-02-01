@@ -17,7 +17,7 @@ enum class Action {
 
 class Dashboard {
 public:
-  explicit Dashboard(const Settings& settings, ImFont* big_font);
+  explicit Dashboard(const Settings& settings);
 
 public:
   void Update(float delta_time, ScamSim& scam_sim);
