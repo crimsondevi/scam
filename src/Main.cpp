@@ -59,14 +59,14 @@ int main(int argc, char* argv[]) {
   // Default font
   {
     ImFontConfig font_cfg;
-    font_cfg.SizePixels = 24.f;
-    const auto font_path = std::filesystem::current_path() / "data" / "m6x11.ttf";
+    font_cfg.SizePixels = 36.f;
+    const auto font_path = std::filesystem::current_path() / "data" / "m6x11plus.ttf";
     io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), font_cfg.SizePixels, &font_cfg);
 
     // Font awesome icon font
     {
       const float base_font_size = font_cfg.SizePixels;
-      const float icon_font_size = base_font_size; // FontAwesome fonts need to have their sizes reduced
+      const float icon_font_size = .75f * base_font_size; // FontAwesome fonts need to have their sizes reduced
 
       static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
       ImFontConfig icons_config;
@@ -81,14 +81,14 @@ int main(int argc, char* argv[]) {
   // Big font
   {
     ImFontConfig font_cfg;
-    font_cfg.SizePixels = 48.f;
-    const auto font_path = std::filesystem::current_path() / "data" / "m6x11.ttf";
+    font_cfg.SizePixels = 72.f;
+    const auto font_path = std::filesystem::current_path() / "data" / "m6x11plus.ttf";
     io.Fonts->AddFontFromFileTTF(font_path.string().c_str(), font_cfg.SizePixels, &font_cfg);
 
     // Font awesome icon font
     {
       const float base_font_size = font_cfg.SizePixels;
-      const float icon_font_size = base_font_size; // FontAwesome fonts need to have their sizes reduced
+      const float icon_font_size = .75f * base_font_size; // FontAwesome fonts need to have their sizes reduced
 
       static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
       ImFontConfig icons_config;

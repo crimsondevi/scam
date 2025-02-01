@@ -19,6 +19,16 @@ void TextCenter(std::string_view view) {
   ImGui::Text("%s", view.data());
 }
 
+void ImagePadded(GLuint tex, float w, float h, ImVec2 padding) {
+  auto size = ImGui::GetContentRegionAvail() - padding * 2.f;
+  auto final_size = Scam::ConstrainToAspectRatio(size, w / h);
+  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2.f - final_size.x / 2.f +
+                       ImGui::GetStyle().FramePadding.x * 2.f);
+  ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
+  ImGui::Image((ImTextureID)(intptr_t)tex, final_size);
+  ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
+}
+
 } // namespace ImGui
 
 namespace Scam {
@@ -77,13 +87,10 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
     if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
-      auto size = ImGui::GetContentRegionAvail();
-      auto final_size = ConstrainToAspectRatio(size, texture_data.w / texture_data.h);
-      ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, final_size);
+      ImGui::ImagePadded(texture_data.tex, texture_data.w, texture_data.h, ImVec2(16.f, 4.f));
     }
     ImGui::PushFont(big_font);
     ImGui::TextCenter(scam_sim.GetCoinState().coin->name);
-    ImGui::TextCenter(std::format("[{}]", scam_sim.GetCoinState().coin->code));
     ImGui::PopFont();
 
     ImGui::SeparatorText(ICON_FA_COINS " Value");
