@@ -153,7 +153,10 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
   if (current_event) {
     ImGui::OpenPopup("Event");
 
-    if (ImGui::BeginPopupModal("Event", nullptr, ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Event",
+                               nullptr,
+                               ImGuiWindowFlags_Modal | ImGuiWindowFlags_AlwaysAutoResize |
+                                   ImGuiWindowFlags_NoDecoration)) {
       bool bought = false;
       size_t chosen_item_index = -1;
 
@@ -168,9 +171,10 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
         ImGui::BeginGroup();
         if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
-          ImGui::ImagePadded((ImTextureID)(intptr_t)texture_data.tex, 128.f, 128.f, ImVec2(16.f, 16.f));
+          ImGui::ImagePadded((ImTextureID)(intptr_t)texture_data.tex, 128.f, 128.f, ImVec2(16.f, 4.f));
         }
         ImGui::TextCenter(item.GetInterfaceData().name);
+        ImGui::Spacing();
 
         if (ImGui::Button(item_label.c_str(), ImVec2(192.f, 48.f))) {
           chosen_item_index = i;
