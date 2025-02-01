@@ -5,7 +5,7 @@
 #include "sim/Simulation.h"
 
 #include <IconsFontAwesome6.h>
-#include <imgui.h>
+
 #include <imgui_internal.h>
 #include <implot.h>
 #include <vector>
@@ -13,8 +13,9 @@
 namespace ImGui {
 
 void TextCenter(std::string_view view) {
+  auto style = ImGui::GetStyle();
   ImVec2 size = ImGui::CalcTextSize(view.data(), nullptr, true);
-  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2 - (size.x / 2));
+  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2 - (size.x / 2) + style.FramePadding.x * 2);
   ImGui::Text("%s", view.data());
 }
 
@@ -25,14 +26,15 @@ namespace Scam {
 Dashboard::Dashboard(const Settings& settings) {
   big_font = ImGui::GetIO().Fonts->Fonts[1];
 
-  window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
+  window_class = std::make_unique<ImGuiWindowClass>();
+  window_class->DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
 
   sound_system = std::make_unique<SoundSystem>();
   sound_system->SetMusicVolume(settings.volume_music);
   sound_system->SetSoundVolume(settings.volume_sound);
   sound_system->PlayMusic();
 
-  test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "coin.png");
+  test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "bitcoin.png");
 }
 
 void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
@@ -55,7 +57,8 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::DockBuilderSplitNode(dock_id_bottom, ImGuiDir_Left, .2f, &dock_id_bottom_left, &dock_id_bottom_right);
 
     ImGuiID dock_id_bottom_mid;
-    ImGui::DockBuilderSplitNode(dock_id_bottom_right, ImGuiDir_Left, .8f, &dock_id_bottom_mid, &dock_id_bottom_right);
+    const float x = .6f * (1.f / (1.f - .2f));
+    ImGui::DockBuilderSplitNode(dock_id_bottom_right, ImGuiDir_Left, x, &dock_id_bottom_mid, &dock_id_bottom_right);
 
     ImGui::DockBuilderDockWindow("Status", dock_id_up_left);
     ImGui::DockBuilderDockWindow("Market", dock_id_up_right);
@@ -68,7 +71,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
   // Status window
   {
-    ImGui::SetNextWindowClass(&window_class);
+    ImGui::SetNextWindowClass(window_class.get());
 
     ImGui::Begin("Status");
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
@@ -80,7 +83,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     }
     ImGui::PushFont(big_font);
     ImGui::TextCenter(scam_sim.GetCoinState().coin->name);
-    ImGui::TextCenter(scam_sim.GetCoinState().coin->code);
+    ImGui::TextCenter(std::format("[{}]", scam_sim.GetCoinState().coin->code));
     ImGui::PopFont();
 
     ImGui::SeparatorText(ICON_FA_COINS " Value");
@@ -89,7 +92,13 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::TextCenter(std::format("${:.2f}", scam_sim.GetCoinState().value));
     ImGui::PopStyleColor();
     ImGui::PopFont();
-    ImGui::TextCenter(std::format("Trend: {:+.4f}", scam_sim.GetCoinState().value_delta));
+
+    const ImVec4 trend_color =
+        scam_sim.GetCoinState().value_delta > 0.f ? ImVec4(0.f, 1.f, 0.f, 1.f) : ImVec4(1.f, 0.f, 0.f, 1.f);
+    ImGui::PushStyleColor(ImGuiCol_Text, trend_color);
+    const char* icon = scam_sim.GetCoinState().value_delta > 0.f ? ICON_FA_ARROW_UP : ICON_FA_ARROW_DOWN;
+    ImGui::TextCenter(std::format("Trend: {:+.2f} {}", scam_sim.GetCoinState().value_delta, icon));
+    ImGui::PopStyleColor();
 
     ImGui::SeparatorText(ICON_FA_ARROW_TREND_UP " Hype");
     float hype = scam_sim.GetCoinState().hype;
@@ -105,7 +114,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
   // Wallet window
   {
-    ImGui::SetNextWindowClass(&window_class);
+    ImGui::SetNextWindowClass(window_class.get());
     ImGui::Begin("Wallet");
     ImGui::SeparatorText(ICON_FA_WALLET " Wallet");
     ImGui::Text("Cash: $%.2f", scam_sim.GetRealMoney());
@@ -193,7 +202,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
   // Market window
   {
-    ImGui::SetNextWindowClass(&window_class);
+    ImGui::SetNextWindowClass(window_class.get());
     ImGui::Begin("Market");
     if (ImPlot::BeginPlot(ICON_FA_MONEY_BILL_TREND_UP " Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
       float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
@@ -252,7 +261,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
   // Time Window
   {
-    ImGui::SetNextWindowClass(&window_class);
+    ImGui::SetNextWindowClass(window_class.get());
     ImGui::Begin("Time");
 
     ImGui::BeginGroup();
@@ -277,7 +286,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
   // Action window
   {
-    ImGui::SetNextWindowClass(&window_class);
+    ImGui::SetNextWindowClass(window_class.get());
     ImGui::Begin("Action");
 
     static ImVec2 button_group_size;

@@ -1,11 +1,10 @@
 ﻿#pragma once
 
+#include "Prelude.h"
 #include "Gameloop.h"
 #include "SoundSystem.h"
 #include "Texture.h"
 #include "sim/Simulation.h"
-
-#include <imgui.h>
 
 namespace Scam {
 
@@ -36,7 +35,7 @@ private:
   uint32_t updated_days = 0;
 
 private:
-  ImGuiWindowClass window_class;
+  std::unique_ptr<ImGuiWindowClass> window_class;
 
 private:
   std::unique_ptr<SoundSystem> sound_system;

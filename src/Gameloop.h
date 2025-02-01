@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Prelude.h"
+
 #include <SDL3/SDL.h>
 
 namespace Scam {
