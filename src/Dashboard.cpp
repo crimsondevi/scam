@@ -4,6 +4,7 @@
 #include "SoundSystem.h"
 #include "sim/Simulation.h"
 
+#include <IconsFontAwesome6.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <implot.h>
@@ -50,10 +51,14 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGuiID dock_id_bottom_left, dock_id_bottom_right;
     ImGui::DockBuilderSplitNode(dock_id_bottom, ImGuiDir_Left, .2f, &dock_id_bottom_left, &dock_id_bottom_right);
 
+    ImGuiID dock_id_bottom_mid;
+    ImGui::DockBuilderSplitNode(dock_id_bottom_right, ImGuiDir_Left, .8f, &dock_id_bottom_mid, &dock_id_bottom_right);
+
     ImGui::DockBuilderDockWindow("Status", dock_id_up_left);
     ImGui::DockBuilderDockWindow("Market", dock_id_up_right);
     ImGui::DockBuilderDockWindow("Wallet", dock_id_bottom_left);
-    ImGui::DockBuilderDockWindow("Action", dock_id_bottom_right);
+    ImGui::DockBuilderDockWindow("Action", dock_id_bottom_mid);
+    ImGui::DockBuilderDockWindow("Time", dock_id_bottom_right);
 
     ImGui::DockBuilderFinish(dockspace_id);
   }
@@ -75,7 +80,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::TextCenter(scam_sim.GetCoinState().coin->code);
     ImGui::PopFont();
 
-    ImGui::SeparatorText("Market Value");
+    ImGui::SeparatorText(ICON_FA_COINS " Market Value");
     ImGui::PushFont(big_font);
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 0.f, 1.f));
     ImGui::TextCenter(std::format("${:.2f}", scam_sim.GetCoinState().value));
@@ -83,11 +88,11 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::PopFont();
     ImGui::TextCenter(std::format("Trend: {:+.4f}", scam_sim.GetCoinState().value_delta));
 
-    ImGui::SeparatorText("Hype");
+    ImGui::SeparatorText(ICON_FA_ARROW_TREND_UP " Hype");
     float hype = scam_sim.GetCoinState().hype;
     ImGui::SliderFloat("##Hype", &hype, -30.f, 30.f, "%.2f", ImGuiSliderFlags_ReadOnly);
 
-    ImGui::SeparatorText("Volatility");
+    ImGui::SeparatorText(ICON_FA_BOLT " Volatility");
     float volatility = scam_sim.GetCoinState().volatility;
     ImGui::SliderFloat("##Volatility", &volatility, 0.f, 10.f, "%.2f", ImGuiSliderFlags_ReadOnly);
 
@@ -99,7 +104,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
   {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Wallet");
-    ImGui::SeparatorText("Wallet");
+    ImGui::SeparatorText(ICON_FA_WALLET " Wallet");
     ImGui::Text("Cash: $%.2f", scam_sim.GetRealMoney());
     ImGui::Text("%s: %.2f", scam_sim.GetCoinState().coin->code.c_str(), scam_sim.GetFakeMoney());
     ImGui::End();
@@ -187,7 +192,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
   {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Market");
-    if (ImPlot::BeginPlot("Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
+    if (ImPlot::BeginPlot(ICON_FA_MONEY_BILL_TREND_UP " Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
       float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
       float x_max = x_data.back() + 365.f / 2.f;
       float y_min = std::min(std::max(scam_sim.GetCoinState().value - 2000.f, -20.f),
@@ -242,27 +247,41 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::End();
   }
 
+  // Time Window
+  {
+    ImGui::SetNextWindowClass(&window_class);
+    ImGui::Begin("Time");
+
+    ImGui::BeginGroup();
+
+    const auto day_label = std::format(ICON_FA_CALENDAR " Day {}", scam_sim.GetCurrentStep());
+    ImGui::SeparatorText(day_label.c_str());
+
+    ImGui::BeginGroup();
+    ImGui::RadioButton(ICON_FA_PAUSE, &speed_multiplier, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton(ICON_FA_PLAY, &speed_multiplier, 1);
+    ImGui::SameLine();
+    ImGui::RadioButton(ICON_FA_FORWARD, &speed_multiplier, 4);
+    ImGui::SameLine();
+    ImGui::RadioButton(ICON_FA_FORWARD_FAST, &speed_multiplier, 16);
+    ImGui::EndGroup();
+
+    ImGui::EndGroup();
+
+    ImGui::End();
+  }
+
   // Action window
   {
     ImGui::SetNextWindowClass(&window_class);
     ImGui::Begin("Action");
 
-    ImGui::Text("Day: %u", scam_sim.GetCurrentStep());
-
-    ImGui::BeginGroup();
-    ImGui::RadioButton("Pause", &speed_multiplier, 0);
-    ImGui::SameLine();
-    ImGui::RadioButton("1x", &speed_multiplier, 1);
-    ImGui::SameLine();
-    ImGui::RadioButton("4x", &speed_multiplier, 4);
-    ImGui::SameLine();
-    ImGui::RadioButton("16x", &speed_multiplier, 16);
-    ImGui::EndGroup();
-
     static ImVec2 button_group_size;
+    static ImVec2 total_group_size;
 
     ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - button_group_size.x) / 2.f);
-    ImGui::SetCursorPosY((ImGui::GetContentRegionAvail().y - button_group_size.y) / 2.f);
+    ImGui::SetCursorPosY((ImGui::GetContentRegionAvail().y - total_group_size.y) / 2.f);
 
     ImGui::BeginGroup();
 
@@ -285,8 +304,9 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::BeginGroup();
     ImGui::PushFont(big_font);
 
-    const auto buy_button_label = std::format("Buy {}x", combo_action == Action::Buy ? combo_multiplier : 1);
-    if (ImGui::Button(buy_button_label.c_str(), {200.f, 100.f})) {
+    const auto buy_button_label =
+        std::format(ICON_FA_ARROW_UP " Buy {}x", combo_action == Action::Buy ? combo_multiplier : 1);
+    if (ImGui::Button(buy_button_label.c_str(), {250.f, 100.f})) {
       if (combo_action != Action::Buy) {
         combo_multiplier = 1;
       }
@@ -302,8 +322,9 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
     ImGui::SameLine();
 
-    const auto sell_button_label = std::format("Sell {}x", combo_action == Action::Sell ? combo_multiplier : 1);
-    if (ImGui::Button(sell_button_label.c_str(), {200.f, 100.f})) {
+    const auto sell_button_label =
+        std::format(ICON_FA_ARROW_DOWN " Sell {}x", combo_action == Action::Sell ? combo_multiplier : 1);
+    if (ImGui::Button(sell_button_label.c_str(), {250.f, 100.f})) {
       if (combo_action != Action::Sell) {
         combo_multiplier = 1;
       }
@@ -331,6 +352,8 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     button_group_size = ImGui::GetItemRectSize();
 
     ImGui::EndGroup();
+
+    total_group_size = ImGui::GetItemRectSize();
 
     ImGui::End();
   }

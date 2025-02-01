@@ -2,7 +2,9 @@
 
 #include "Gameloop.h"
 
+#include <IconsFontAwesome6.h>
 #include <SDL3/SDL.h>
+#include <filesystem>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
@@ -57,6 +59,17 @@ int main(int argc, char* argv[]) {
   ImFontConfig font_cfg;
   font_cfg.SizePixels = 26.f;
   io.Fonts->AddFontDefault(&font_cfg);
+
+  float base_font_size = font_cfg.SizePixels;
+  float icon_font_size = base_font_size * 2.f / 3.f; // FontAwesome fonts need to have their sizes reduced
+
+  static const ImWchar icons_ranges[] = {ICON_MIN_FA, ICON_MAX_16_FA, 0};
+  ImFontConfig icons_config;
+  icons_config.MergeMode = true;
+  icons_config.PixelSnapH = true;
+  icons_config.GlyphMinAdvanceX = icon_font_size;
+  const auto path = std::filesystem::current_path() / "data" / FONT_ICON_FILE_NAME_FAS;
+  io.Fonts->AddFontFromFileTTF(path.string().c_str(), icon_font_size, &icons_config, icons_ranges);
 
   ImPlot::CreateContext();
 

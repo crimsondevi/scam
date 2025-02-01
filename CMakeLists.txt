@@ -94,6 +94,10 @@ target_include_directories(implot PUBLIC thirdparty/implot)
 add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE thirdparty/stb)
 
+# FONTS
+add_library(fonts INTERFACE)
+target_include_directories(fonts INTERFACE thirdparty/fonts)
+
 target_link_libraries(Scam
         PRIVATE
         ${OPENGL_LIBRARIES}
@@ -104,6 +108,7 @@ target_link_libraries(Scam
         SDL3::SDL3
         SDL3_mixer::SDL3_mixer
         stb
+        fonts
 )
 
 add_custom_target(data_files ALL
