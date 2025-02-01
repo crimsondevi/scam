@@ -13,17 +13,15 @@
 namespace ImGui {
 
 void TextCenter(std::string_view view) {
-  auto style = ImGui::GetStyle();
   ImVec2 size = ImGui::CalcTextSize(view.data(), nullptr, true);
-  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2 - (size.x / 2) + style.FramePadding.x * 2);
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x / 2 - (size.x / 2));
   ImGui::Text("%s", view.data());
 }
 
 void ImagePadded(GLuint tex, float w, float h, ImVec2 padding) {
   auto size = ImGui::GetContentRegionAvail() - padding * 2.f;
   auto final_size = Scam::ConstrainToAspectRatio(size, w / h);
-  ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x / 2.f - final_size.x / 2.f +
-                       ImGui::GetStyle().FramePadding.x * 2.f);
+  ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x / 2.f - final_size.x / 2.f);
   ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
   ImGui::Image((ImTextureID)(intptr_t)tex, final_size);
   ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
@@ -170,9 +168,9 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
         ImGui::BeginGroup();
         if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
-          ImGui::Image((ImTextureID)(intptr_t)texture_data.tex, ImVec2(192.f, 192.f));
+          ImGui::ImagePadded((ImTextureID)(intptr_t)texture_data.tex, 128.f, 128.f, ImVec2(16.f, 16.f));
         }
-        ImGui::Text("%s", item.GetInterfaceData().name.c_str());
+        ImGui::TextCenter(item.GetInterfaceData().name);
 
         if (ImGui::Button(item_label.c_str(), ImVec2(192.f, 48.f))) {
           chosen_item_index = i;
@@ -185,12 +183,6 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
             ImGui::Text("%s", item.GetInterfaceData().description.c_str());
             ImGui::EndTooltip();
           }
-        }
-
-        if (i != current_event->items.size() - 1) {
-          ImGui::SameLine();
-          ImGui::Spacing();
-          ImGui::SameLine();
         }
       }
 
