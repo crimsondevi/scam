@@ -4,13 +4,13 @@
 #include "FrameCounter.h"
 #include "sim/Simulation.h"
 
+#include <IconsFontAwesome6.h>
 #include <glad/glad.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 #include <imgui_internal.h>
 #include <thread>
-#include <IconsFontAwesome6.h>
 
 namespace Scam {
 
@@ -36,7 +36,7 @@ void main_loop(SDL_Window* window) {
   Settings settings;
   bool quit = false;
 
-  std::unique_ptr<Dashboard> dashboard = std::make_unique<Dashboard>(big_font);
+  std::unique_ptr<Dashboard> dashboard = std::make_unique<Dashboard>(settings, big_font);
   std::unique_ptr<ScamSim> scam_sim = std::make_unique<ScamSim>();
 
   {
@@ -95,7 +95,7 @@ void main_loop(SDL_Window* window) {
       game_over = false;
       simulation_timer = 0.f;
 
-      dashboard = std::make_unique<Dashboard>(big_font);
+      dashboard = std::make_unique<Dashboard>(settings, big_font);
       scam_sim = std::make_unique<ScamSim>();
 
       {

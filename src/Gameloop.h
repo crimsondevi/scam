@@ -5,7 +5,7 @@
 namespace Scam {
 
 struct Settings {
-  float volume_music = 1.f;
+  float volume_music = .1f;
   float volume_sound = 1.f;
 };
 

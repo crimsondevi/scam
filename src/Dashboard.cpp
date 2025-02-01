@@ -22,12 +22,13 @@ void TextCenter(std::string_view view) {
 
 namespace Scam {
 
-Dashboard::Dashboard(ImFont* big_font) : big_font(big_font) {
+Dashboard::Dashboard(const Settings& settings, ImFont* big_font) : big_font(big_font) {
   window_class.DockNodeFlagsOverrideSet = ImGuiDockNodeFlags_AutoHideTabBar;
 
   sound_system = std::make_unique<SoundSystem>();
-
-  //  sound_system->PlayMusic();
+  sound_system->SetMusicVolume(settings.volume_music);
+  sound_system->SetSoundVolume(settings.volume_sound);
+  sound_system->PlayMusic();
 
   test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "coin.png");
 }

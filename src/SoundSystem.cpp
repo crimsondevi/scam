@@ -68,7 +68,9 @@ void SoundSystem::SetMusicVolume(float volume) {
 }
 
 void SoundSystem::SetSoundVolume(float volume) {
-  Mix_Volume(1, static_cast<int>(volume * MIX_MAX_VOLUME));
+  for (int i = 0; i < MIX_CHANNELS; i++) {
+    Mix_Volume(i, static_cast<int>(volume * MIX_MAX_VOLUME));
+  }
 }
 
 } // namespace Scam
