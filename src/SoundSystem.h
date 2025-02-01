@@ -12,6 +12,7 @@ enum SoundCue {
   Hover,
   Open,
   Purchase,
+  Fail,
 };
 
 class SoundSystem {
@@ -31,6 +32,7 @@ public:
 private:
   Mix_Music* music_sample;
   std::map<SoundCue, Mix_Chunk*> samples;
+  int current_channel = 0;
 };
 
 } // namespace Scam

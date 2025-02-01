@@ -306,9 +306,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
     ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
     if (ImGui::Button(ICON_FA_MONEY_BILLS " Buy", {250.f, 100.f})) {
-      if (combo_action != Action::Buy) {
-        combo_multiplier = 1;
-      }
+      combo_multiplier = combo_action != Action::Buy ? 1 : combo_multiplier;
 
       if (scam_sim.AddTradeOrder(combo_multiplier)) {
         sound_system->PlaySound(SoundCue::Purchase);
@@ -316,6 +314,8 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
         combo_multiplier += 1;
         combo_action = Action::Buy;
         combo_timer = combo_timer_reset_threshold;
+      } else {
+        sound_system->PlaySound(SoundCue::Fail);
       }
     }
     ImGui::PopItemFlag();
@@ -324,9 +324,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
     ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
     if (ImGui::Button(ICON_FA_SACK_DOLLAR " Sell", {250.f, 100.f})) {
-      if (combo_action != Action::Sell) {
-        combo_multiplier = 1;
-      }
+      combo_multiplier = combo_action != Action::Sell ? 1 : combo_multiplier;
 
       if (scam_sim.AddTradeOrder(-combo_multiplier)) {
         sound_system->PlaySound(SoundCue::Click);
@@ -334,6 +332,8 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
         combo_multiplier += 1;
         combo_action = Action::Sell;
         combo_timer = combo_timer_reset_threshold;
+      } else {
+        sound_system->PlaySound(SoundCue::Fail);
       }
     }
     ImGui::PopItemFlag();
