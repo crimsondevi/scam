@@ -80,7 +80,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::TextCenter(scam_sim.GetCoinState().coin->code);
     ImGui::PopFont();
 
-    ImGui::SeparatorText(ICON_FA_COINS " Market Value");
+    ImGui::SeparatorText(ICON_FA_COINS " Value");
     ImGui::PushFont(big_font);
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 0.f, 1.f));
     ImGui::TextCenter(std::format("${:.2f}", scam_sim.GetCoinState().value));
@@ -304,9 +304,8 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::BeginGroup();
     ImGui::PushFont(big_font);
 
-    const auto buy_button_label =
-        std::format(ICON_FA_ARROW_UP " Buy {}x", combo_action == Action::Buy ? combo_multiplier : 1);
-    if (ImGui::Button(buy_button_label.c_str(), {250.f, 100.f})) {
+    ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
+    if (ImGui::Button(ICON_FA_MONEY_BILLS " Buy", {250.f, 100.f})) {
       if (combo_action != Action::Buy) {
         combo_multiplier = 1;
       }
@@ -319,12 +318,12 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
         combo_timer = combo_timer_reset_threshold;
       }
     }
+    ImGui::PopItemFlag();
 
     ImGui::SameLine();
 
-    const auto sell_button_label =
-        std::format(ICON_FA_ARROW_DOWN " Sell {}x", combo_action == Action::Sell ? combo_multiplier : 1);
-    if (ImGui::Button(sell_button_label.c_str(), {250.f, 100.f})) {
+    ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
+    if (ImGui::Button(ICON_FA_SACK_DOLLAR " Sell", {250.f, 100.f})) {
       if (combo_action != Action::Sell) {
         combo_multiplier = 1;
       }
@@ -337,6 +336,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
         combo_timer = combo_timer_reset_threshold;
       }
     }
+    ImGui::PopItemFlag();
 
     combo_timer -= delta_time;
 
