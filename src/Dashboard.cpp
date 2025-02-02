@@ -210,8 +210,8 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     if (ImPlot::BeginPlot(ICON_FA_MONEY_BILL_TREND_UP " Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
       float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
       float x_max = x_data.back() + 365.f / 2.f;
-      float y_min = std::min(std::max(scam_sim.GetCoinState().value - 2000.f, -20.f),
-                             static_cast<float>(scam_sim.GetBubbleThreshold()));
+      float y_min = std::min(std::max(scam_sim.GetCoinState().value - 200.f, -20.f),
+                             static_cast<float>(scam_sim.GetBubbleThreshold()) - 20.f);
       const uint32_t offset = std::max(static_cast<int>(y_data.size()) - 200, 0);
       float y_max = *std::max_element(y_data.begin() + offset, y_data.end()) + 500.f;
       float y_center = std::lerp(y_max, y_min, .5f);

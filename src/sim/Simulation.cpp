@@ -67,7 +67,13 @@ void ScamSim::StepSimulation() {
   ApplyModifiers();
   UpdateCoin();
 
-  bubble_threshold += .25f;
+  for (const auto& event : events) {
+    if (event->type == EventType::Audit && event->day == current_step) {
+      bubble_threshold_target = std::lerp(bubble_threshold_target, coin_state->value, .5f);
+    }
+  }
+
+  bubble_threshold = std::lerp(bubble_threshold, bubble_threshold_target, .1f);
 
   current_step++;
 }

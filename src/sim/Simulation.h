@@ -91,6 +91,7 @@ private:
   double fake_money = 0.0;
   double real_money = 100.0;
   double bubble_threshold = .1f;
+  double bubble_threshold_target = .1f;
   int processed_trades = 0;
 
   // current step of the simulation, days by default but does not matter
