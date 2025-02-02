@@ -34,16 +34,18 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
 
 bool ScamSim::AddTradeOrder(int order) {
   const auto [max_buys, max_sells] = GetMaxBuySell();
+  const auto clamped_order = std::clamp(order, -static_cast<int>(max_sells), static_cast<int>(max_buys));
 
-  if (order > max_buys || order < -max_sells) {
+  if (clamped_order == 0) {
     return false;
   }
 
-  if (player_actions.trade_wish < 0 && order > 0 || player_actions.trade_wish > 0 && order < 0) {
-    player_actions.trade_wish = order;
+  if (player_actions.trade_wish < 0 && clamped_order > 0 || player_actions.trade_wish > 0 && clamped_order < 0) {
+    player_actions.trade_wish = clamped_order;
   } else {
-    player_actions.trade_wish += order;
+    player_actions.trade_wish += clamped_order;
   }
+
   return true;
 }
 
