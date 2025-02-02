@@ -108,6 +108,7 @@ void main_loop(SDL_Window* window) {
           if (event->day == scam_sim->GetCurrentStep() && event->type == EventType::Audit &&
               scam_sim->HasBubbleBurst()) {
             game_over = true;
+            dashboard->GameOver();
           }
         }
       }

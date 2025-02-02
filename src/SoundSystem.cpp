@@ -28,6 +28,7 @@ SoundSystem::SoundSystem() {
     LoadSample(Open, std::filesystem::current_path() / "data" / "A_UI_Open_01.wav");
     LoadSample(Purchase, std::filesystem::current_path() / "data" / "A_UI_Purchase_01.wav");
     LoadSample(Fail, std::filesystem::current_path() / "data" / "A_UI_Fail_01.wav");
+    LoadSample(GameOver, std::filesystem::current_path() / "data" / "A_UI_GameOver_01.wav");
   }
 }
 
@@ -47,6 +48,10 @@ SoundSystem::~SoundSystem() {
 
 void SoundSystem::PlayMusic() {
   Mix_PlayMusic(music_sample, -1);
+}
+
+void SoundSystem::StopMusic() {
+  Mix_PauseMusic();
 }
 
 void SoundSystem::PlaySound(const SoundCue& sound_cue) {

@@ -13,6 +13,7 @@ enum SoundCue {
   Open,
   Purchase,
   Fail,
+  GameOver,
 };
 
 class SoundSystem {
@@ -22,6 +23,7 @@ public:
 
 public:
   void PlayMusic();
+  void StopMusic();
   void PlaySound(const SoundCue& sound_cue);
   void SetMusicVolume(float volume);
   void SetSoundVolume(float volume);

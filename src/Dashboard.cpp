@@ -436,6 +436,11 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
   }
 }
 
+void Dashboard::GameOver() {
+  sound_system->StopMusic();
+  sound_system->PlaySound(SoundCue::GameOver);
+}
+
 void Dashboard::ApplySettings(const Settings& settings) {
   sound_system->SetMusicVolume(settings.volume_music);
   sound_system->SetSoundVolume(settings.volume_sound);

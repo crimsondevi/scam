@@ -21,6 +21,7 @@ public:
 
 public:
   void Update(float delta_time, ScamSim& scam_sim);
+  void GameOver();
 
 public:
   void ApplySettings(const Settings& settings);
