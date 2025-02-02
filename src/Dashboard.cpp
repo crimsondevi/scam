@@ -208,13 +208,16 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::SetNextWindowClass(window_class.get());
     ImGui::Begin("Market");
     if (ImPlot::BeginPlot(ICON_FA_MONEY_BILL_TREND_UP " Market", ImVec2(-1, -1), ImPlotAxisFlags_AutoFit)) {
-      float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
-      float x_max = x_data.back() + 365.f / 2.f;
-      float y_min = std::min(std::max(scam_sim.GetCoinState().value - 200.f, -20.f),
-                             static_cast<float>(scam_sim.GetBubbleThreshold()) - 20.f);
+      constexpr float padding = 100.f;
+      constexpr float upwards = 500.f;
+      const float x_min = std::max(x_data.back() - 365.f / 2.f, 0.f);
+      const float x_max = x_data.back() + 365.f / 2.f;
+      const float y_min = std::min(std::max(scam_sim.GetCoinState().value - 200.f, -padding),
+                                   static_cast<float>(scam_sim.GetBubbleThreshold()) - padding);
       const uint32_t offset = std::max(static_cast<int>(y_data.size()) - 200, 0);
-      float y_max = *std::max_element(y_data.begin() + offset, y_data.end()) + 500.f;
-      float y_center = std::lerp(y_max, y_min, .5f);
+      const float y_max = std::max(*std::max_element(y_data.begin() + offset, y_data.end()) + upwards,
+                                   static_cast<float>(scam_sim.GetBubbleThreshold()) + padding);
+      const float y_center = std::lerp(y_max, y_min, .5f);
 
       ImPlot::SetupAxes(
           "Day", "Stonks", ImPlotAxisFlags_NoHighlight, ImPlotAxisFlags_Opposite | ImPlotAxisFlags_NoHighlight);
@@ -229,7 +232,8 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
       ImPlot::SetNextLineStyle(ImVec4(1.f, 0.f, 0.f, 1.f), 2.f);
       ImPlot::PlotInfLines("##Bubble", &bubble_threshold, 1, ImPlotInfLinesFlags_Horizontal);
       ImPlot::PushStyleColor(ImPlotCol_InlayText, ImVec4(1.f, 0.f, 0.f, 1.f));
-      ImPlot::PlotText("Bubble", x_data.back(), bubble_threshold, ImVec2(50.f, -30.f));
+      const auto bubble_text_offset = ImVec2(50.f, bubble_threshold > y_center ? 30.f : -30.f);
+      ImPlot::PlotText("Bubble", x_data.back(), bubble_threshold, bubble_text_offset);
       ImPlot::PopStyleColor();
 
       // Draw events
@@ -256,7 +260,11 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
                        ImPlotLineFlags_Shaded);
       ImPlot::SetNextLineStyle(ImVec4(1.f, 1.f, 1.f, 1.f), 2.f);
       ImPlot::PlotInfLines("##Today", &x_data.back(), 1);
-      ImPlot::PlotText("Today", x_data.back(), y_max, ImVec2(50.f, 30.f));
+      if (bubble_threshold < y_center) {
+        ImPlot::PlotText("Today", x_data.back(), y_max, ImVec2(50.f, 30.f));
+      } else {
+        ImPlot::PlotText("Today", x_data.back(), y_min, ImVec2(50.f, -30.f));
+      }
       ImPlot::SetNextMarkerStyle(
           ImPlotMarker_Circle, 10.f, ImVec4(.8f, .6f, .1f, 1.f), 2.f, ImVec4(1.f, 1.f, 1.f, 1.f));
       ImPlot::PlotScatter("##Coin", x_data.data() + (x_data.size() - 1), y_data.data() + (x_data.size() - 1), 1);
