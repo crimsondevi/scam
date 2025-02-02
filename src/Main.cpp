@@ -11,8 +11,12 @@
 #include <imgui_impl_sdl3.h>
 #include <implot.h>
 
+SDL_Time Scam::start_time = 0;
+
 int main(int argc, char* argv[]) {
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
+  SDL_GetCurrentTime(&Scam::start_time);
 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -109,7 +113,7 @@ int main(int argc, char* argv[]) {
   // Setup Platform/Renderer backends
 
   ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
-  ImGui_ImplOpenGL3_Init("#version 330");
+  ImGui_ImplOpenGL3_Init("#version 330 core");
 
   // MAIN LOOP
 

@@ -33,6 +33,8 @@ set(SCAM_SRC
         src/sim/Simulation.h
         src/Texture.cpp
         src/Texture.h
+        src/Shader.cpp
+        src/Shader.h
         src/sim/Event.cpp
         src/sim/Event.h
         src/sim/Coins.h

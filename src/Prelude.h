@@ -3,6 +3,8 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui.h>
 
+#include <SDL3/SDL_time.h>
+#include <fstream>
 #include <spdlog/spdlog.h>
 
 namespace Scam {
@@ -18,6 +20,24 @@ inline ImVec2 ConstrainToAspectRatio(const ImVec2& size, float target_aspect_rat
   float x = aspect_ratio < target_aspect_ratio ? size.x : (size.y * target_aspect_ratio);
   float y = aspect_ratio > target_aspect_ratio ? size.y : (size.x / target_aspect_ratio);
   return {x, y};
+}
+
+inline bool LoadFileAsString(const std::string& filename, std::string& out_string) {
+  std::ifstream stream(filename);
+  std::stringstream buffer;
+  buffer << stream.rdbuf();
+  out_string = buffer.str();
+  return true;
+}
+
+extern SDL_Time start_time;
+
+inline double GetTimeSinceStart() {
+  SDL_Time current_time;
+  SDL_GetCurrentTime(&current_time);
+  const SDL_Time elapsed_time = current_time - start_time;
+  constexpr double ns = 1000.0 * 1000.0 * 1000.0;
+  return static_cast<double>(elapsed_time) / ns;
 }
 
 } // namespace Scam

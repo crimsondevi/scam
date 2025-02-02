@@ -2,7 +2,6 @@
 
 #include "Dashboard.h"
 #include "FrameCounter.h"
-#include "Prelude.h"
 #include "sim/Simulation.h"
 
 #include <glad/glad.h>
@@ -19,8 +18,11 @@ void main_loop(SDL_Window* window) {
   Settings settings;
   bool quit = false;
 
+  SDL_Time time;
+  SDL_GetCurrentTime(&time);
+
   std::unique_ptr<Dashboard> dashboard = std::make_unique<Dashboard>(settings);
-  std::unique_ptr<ScamSim> scam_sim = std::make_unique<ScamSim>();
+  std::unique_ptr<ScamSim> scam_sim = std::make_unique<ScamSim>(time);
 
   {
     auto coins = GetAvailableCoins();
@@ -82,7 +84,9 @@ void main_loop(SDL_Window* window) {
       simulation_timer = 0.f;
 
       dashboard = std::make_unique<Dashboard>(settings);
-      scam_sim = std::make_unique<ScamSim>();
+
+      SDL_GetCurrentTime(&time);
+      scam_sim = std::make_unique<ScamSim>(time);
 
       {
         auto coins = GetAvailableCoins();

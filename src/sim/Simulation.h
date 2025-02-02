@@ -5,6 +5,7 @@
 #include "Item.h"
 #include "Modifier.h"
 
+#include "SDL3/SDL_time.h"
 #include <memory>
 #include <random>
 #include <vector>
@@ -26,7 +27,7 @@ struct PlayerActions {
 
 class ScamSim {
 public:
-  ScamSim();
+  explicit ScamSim(SDL_Time time);
 
 public:
   [[nodiscard]] const CoinState& GetCoinState() const {
@@ -97,7 +98,7 @@ private:
   // current step of the simulation, days by default but does not matter
   int current_step = 0;
 
-  std::mt19937 rng;
+  std::default_random_engine rng;
 
 private:
   friend class Item;

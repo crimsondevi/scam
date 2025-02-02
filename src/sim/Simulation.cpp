@@ -3,7 +3,6 @@
 #include "Modifier.h"
 
 #include <SDL3/SDL_stdinc.h>
-#include <SDL3/SDL_time.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -11,12 +10,7 @@
 
 namespace Scam {
 
-ScamSim::ScamSim() {
-  SDL_Time time;
-  SDL_GetCurrentTime(&time);
-  std::default_random_engine generator(static_cast<uint32_t>(time));
-  rng = std::mt19937(generator());
-}
+ScamSim::ScamSim(SDL_Time time) : rng(std::default_random_engine(static_cast<uint32_t>(time))) {}
 
 void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
   coin_state = std::make_unique<CoinState>();

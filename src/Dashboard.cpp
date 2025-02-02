@@ -18,12 +18,55 @@ void TextCenter(std::string_view view) {
   ImGui::Text("%s", view.data());
 }
 
-void ImagePadded(GLuint tex, float w, float h, ImVec2 padding) {
+void ImagePadded(GLuint tex, float w, float h, ImVec2 padding, Scam::Shader* shader, float per_instance_random) {
   auto size = ImGui::GetContentRegionAvail() - padding * 2.f;
   auto final_size = Scam::ConstrainToAspectRatio(size, w / h);
   ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x / 2.f - final_size.x / 2.f);
   ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
+
+  struct CallbackData {
+    Scam::Shader* shader{};
+    float per_instance_random{};
+  } callback_data;
+
+  callback_data.shader = shader;
+  callback_data.per_instance_random = per_instance_random;
+
+  auto draw_list = ImGui::GetWindowDrawList();
+  draw_list->AddCallback(
+      [](const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+        if (auto callback_data_ptr = static_cast<CallbackData*>(cmd->UserCallbackData)) {
+          if (Scam::ShaderData shader_data; callback_data_ptr->shader->GetShaderData(shader_data)) {
+            ImDrawData* draw_data = ImGui::GetDrawData();
+            float L = draw_data->DisplayPos.x;
+            float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
+            float T = draw_data->DisplayPos.y;
+            float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
+            const float proj_mtx[4][4] = {
+                {2.0f / (R - L), 0.0f, 0.0f, 0.0f},
+                {0.0f, 2.0f / (T - B), 0.0f, 0.0f},
+                {0.0f, 0.0f, -1.0f, 0.0f},
+                {(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f},
+            };
+
+            std::default_random_engine generator(static_cast<uint32_t>(cmd->IdxOffset));
+
+            glUseProgram(shader_data.program);
+            glUniformMatrix4fv(glGetUniformLocation(shader_data.program, "ProjMtx"), 1, GL_FALSE, &proj_mtx[0][0]);
+            glUniform1f(glGetUniformLocation(shader_data.program, "Time"),
+                        static_cast<float>(Scam::GetTimeSinceStart()));
+            glUniform1f(glGetUniformLocation(shader_data.program, "PerInstanceRandom"),
+                        static_cast<float>(callback_data_ptr->per_instance_random));
+          }
+        }
+      },
+      &callback_data,
+      sizeof(CallbackData));
+
   ImGui::Image((ImTextureID)(intptr_t)tex, final_size);
+
+  draw_list->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
+
   ImGui::SetCursorPosY(ImGui::GetCursorPosY() + padding.y);
 }
 
@@ -43,6 +86,8 @@ Dashboard::Dashboard(const Settings& settings) {
   sound_system->PlayMusic();
 
   test_texture.LoadFromFile(std::filesystem::current_path() / "data" / "bitcoin.png");
+  test_shader.Load((std::filesystem::current_path() / "data" / "test_vert.glsl").string(),
+                   (std::filesystem::current_path() / "data" / "test_frag.glsl").string());
 }
 
 void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
@@ -85,7 +130,7 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
 
     if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
-      ImGui::ImagePadded(texture_data.tex, texture_data.w, texture_data.h, ImVec2(16.f, 4.f));
+      ImGui::ImagePadded(texture_data.tex, texture_data.w, texture_data.h, ImVec2(16.f, 4.f), &test_shader, 0.f);
     }
     ImGui::PushFont(big_font);
     ImGui::TextCenter(scam_sim.GetCoinState().coin->name);
@@ -171,7 +216,12 @@ void Dashboard::Update(float delta_time, ScamSim& scam_sim) {
 
         ImGui::BeginGroup();
         if (TextureData texture_data; test_texture.GetTextureData(texture_data)) {
-          ImGui::ImagePadded((ImTextureID)(intptr_t)texture_data.tex, 128.f, 128.f, ImVec2(16.f, 4.f));
+          ImGui::ImagePadded((ImTextureID)(intptr_t)texture_data.tex,
+                             128.f,
+                             128.f,
+                             ImVec2(16.f, 4.f),
+                             &test_shader,
+                             static_cast<float>(i) * .2f);
         }
         ImGui::TextCenter(item.GetInterfaceData().name);
         ImGui::Spacing();

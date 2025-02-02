@@ -1,7 +1,8 @@
 ﻿#pragma once
 
-#include "Prelude.h"
 #include "Gameloop.h"
+#include "Prelude.h"
+#include "Shader.h"
 #include "SoundSystem.h"
 #include "Texture.h"
 #include "sim/Simulation.h"
@@ -41,6 +42,7 @@ private:
   std::unique_ptr<SoundSystem> sound_system;
 
   Texture test_texture;
+  Shader test_shader;
 
   int speed_multiplier = 1;
 
