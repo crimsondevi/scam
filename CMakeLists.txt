@@ -24,6 +24,10 @@ set(SCAM_SRC
         src/Dashboard.h
         src/SoundSystem.cpp
         src/SoundSystem.h
+        src/Texture.cpp
+        src/Texture.h
+        src/Shader.cpp
+        src/Shader.h
         src/sim/Item.cpp
         src/sim/Item.h
         src/sim/Modifier.cpp
@@ -31,10 +35,6 @@ set(SCAM_SRC
         src/sim/ScamInterface.h
         src/sim/Simulation.cpp
         src/sim/Simulation.h
-        src/Texture.cpp
-        src/Texture.h
-        src/Shader.cpp
-        src/Shader.h
         src/sim/Event.cpp
         src/sim/Event.h
         src/sim/Coins.h

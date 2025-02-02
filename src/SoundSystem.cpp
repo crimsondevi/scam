@@ -13,7 +13,7 @@ SoundSystem::SoundSystem() {
 
   // Load music
   {
-    auto file = std::filesystem::current_path() / "data" / "A_Music_Loop.mp3";
+    auto file = std::filesystem::current_path() / "data" / "A_Music.mp3";
     if (auto chunk = Mix_LoadMUS(file.string().c_str())) {
       LOG_INFO("Loaded audio sample: {}", file.string());
       music_sample = chunk;

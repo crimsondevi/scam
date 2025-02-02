@@ -16,6 +16,11 @@ enum SoundCue {
   GameOver,
 };
 
+struct Settings {
+  float volume_music = .5f;
+  float volume_sound = 1.f;
+};
+
 class SoundSystem {
 public:
   SoundSystem();
