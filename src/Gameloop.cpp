@@ -1,8 +1,8 @@
 #include "Gameloop.h"
 
-#include "Prelude.h"
 #include "Dashboard.h"
 #include "FrameCounter.h"
+#include "Prelude.h"
 #include "sim/Simulation.h"
 
 #include <glad/glad.h>
@@ -67,6 +67,9 @@ void main_loop(SDL_Window* window) {
           } else {
             dashboard->SetSpeedMultiplier(last_speed_multiplier);
           }
+          break;
+        case SDLK_R:
+          try_again = true;
           break;
         }
       }
