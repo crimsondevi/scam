@@ -34,7 +34,7 @@ void ScamSim::StartNewCoin(std::unique_ptr<ScamCoin> new_coin) {
 
 bool ScamSim::AddTradeOrder(int order) {
   const auto [max_buys, max_sells] = GetMaxBuySell();
-  const auto clamped_order = std::clamp(order, -static_cast<int>(max_sells), static_cast<int>(max_buys));
+  const auto clamped_order = static_cast<int>(std::clamp(static_cast<double>(order), -max_sells, max_buys));
 
   if (clamped_order == 0) {
     return false;
